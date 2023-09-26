@@ -33,12 +33,9 @@ public class Supplier {
     @JsonManagedReference
     private List<Good> goods;
 
-//    @OneToMany(mappedBy = "supplier")
-//    private List<GoodOperation> goodOperations;
-
-//    @JsonIgnore
-//    @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-//    private List<Good> goods;
+    @JsonIgnore
+    @OneToMany(mappedBy = "supplier")
+    private List<GoodOperation> goodOperations;
 
     public Supplier(int id, String name) {
         this.id = id;

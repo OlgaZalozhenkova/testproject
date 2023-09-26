@@ -1,10 +1,7 @@
 package com.example.testproject.models;
 
-import com.example.testproject.util.CustomListDeserializer;
-import com.example.testproject.util.CustomListSerializer;
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -38,10 +35,6 @@ public class Good {
     @Column(name ="quantity")
     int quantity;
 
-    //    @JsonIgnore
-//    @JsonSerialize(using = CustomListSerializer.class)
-//    @JsonDeserialize(using = CustomListDeserializer.class)
-//    @JsonBackReference
     @ManyToMany
     @JoinTable(name = "good_supplier",
             joinColumns = @JoinColumn(name = "good_id"),
@@ -54,9 +47,8 @@ public class Good {
             inverseJoinColumns = @JoinColumn(name = "operation_id"))
     private List<Operation> operations;
 
-//    @ManyToOne
-//    @JoinColumn(name = "supplier_id")
-//    private Supplier supplier;
+    @OneToMany(mappedBy = "good")
+    private List<GoodOperation> goodOperations;
 
     public Good(int id, String name) {
         this.id = id;

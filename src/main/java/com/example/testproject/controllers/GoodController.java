@@ -38,6 +38,10 @@ public class GoodController {
         this.operationRepository = operationRepository;
     }
 
+    @GetMapping("/all")
+    public List<Good> findAll() {
+        return goodRepository.findAll();
+    }
     @GetMapping("/item/{id}")
     public Good findGood(@PathVariable("id") int id) {
         return goodRepository.getGoodByIdQuery(id);
@@ -73,6 +77,11 @@ public class GoodController {
     @PostMapping("/create/supplier")
     public Supplier createSupplier(@RequestBody SupplierDTO supplierDTO) {
         return supplierService.createSupplier(supplierDTO);
+    }
+
+    @GetMapping("/supplier")
+    public Supplier findByName(@RequestParam("name") String name) {
+        return supplierRepository.findByName(name);
     }
 
     @GetMapping("/query/{id}")

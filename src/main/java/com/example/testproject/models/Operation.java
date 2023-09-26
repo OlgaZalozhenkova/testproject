@@ -40,7 +40,8 @@ public class Operation {
     @JsonManagedReference
     private List<Good> goods;
 
-//    @OneToMany(mappedBy = "operation")
-//    private List<GoodOperation> goodOperations;
+    @JsonIgnore
+    @OneToMany(mappedBy = "operation")
+    private List<GoodOperation> goodOperations;
 
 }

@@ -1,0 +1,8 @@
+GET http://localhost:1032/good/supplier?name=Sidorov
+Accept: application/json
+
+###
+GET http://localhost:1029/good/all
+Accept: application/json
+
+###
