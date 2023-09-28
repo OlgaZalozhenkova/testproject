@@ -1,10 +1,15 @@
 package com.example.testproject.models;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.Date;
 
 @Entity
 @Getter
@@ -12,6 +17,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "good_operations")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class GoodOperation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,22 +38,23 @@ public class GoodOperation {
     @Column(name = "operation_quantity")
     int quantity;
 
-    @Column(name="supplier_name")
+    @Column(name = "supplier_name")
     String supplierName;
 
+    @Column(name = "date")
+    Date date;
+
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "good_id", referencedColumnName = "id")
     private Good good;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "supplier_id", referencedColumnName = "id")
     private Supplier supplier;
 
-    @ManyToOne
-    @JoinColumn(name = "operation_current_id", referencedColumnName = "id")
-    private Operation operation;
-
-    public GoodOperation(String item, String operationCurrent, int price, int quantity, String supplierName, Good good, Supplier supplier, Operation operation) {
+    public GoodOperation(String item, String operationCurrent, int price, int quantity, String supplierName, Good good, Supplier supplier, Date date) {
         this.item = item;
         this.operationCurrent = operationCurrent;
         this.price = price;
@@ -53,6 +62,6 @@ public class GoodOperation {
         this.supplierName = supplierName;
         this.good = good;
         this.supplier = supplier;
-        this.operation = operation;
+        this.date = date;
     }
 }

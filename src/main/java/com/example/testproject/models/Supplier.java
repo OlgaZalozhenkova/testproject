@@ -37,8 +37,4 @@ public class Supplier {
     @OneToMany(mappedBy = "supplier")
     private List<GoodOperation> goodOperations;
 
-    public Supplier(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
 }

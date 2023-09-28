@@ -3,10 +3,10 @@ package com.example.testproject.controllers;
 import com.example.testproject.dto.GoodDTO;
 import com.example.testproject.dto.SupplierDTO;
 import com.example.testproject.models.Good;
-import com.example.testproject.models.Operation;
+import com.example.testproject.models.GoodOperation;
 import com.example.testproject.models.Supplier;
+import com.example.testproject.repositories.GoodOperationRepository;
 import com.example.testproject.repositories.GoodRepository;
-import com.example.testproject.repositories.OperationRepository;
 import com.example.testproject.repositories.SupplierRepository;
 import com.example.testproject.servicies.GoodService;
 import com.example.testproject.servicies.SupplierService;
@@ -14,8 +14,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
-import java.util.*;
 
 
 @RestController
@@ -26,16 +26,16 @@ public class GoodController {
     ModelMapper modelMapper;
     GoodService goodService;
     SupplierService supplierService;
-    OperationRepository operationRepository;
+    GoodOperationRepository goodOperationRepository;
 
     @Autowired
-    public GoodController(GoodRepository goodRepository, SupplierRepository supplierRepository, ModelMapper modelMapper, GoodService goodService, SupplierService supplierService, OperationRepository operationRepository) {
+    public GoodController(GoodRepository goodRepository, SupplierRepository supplierRepository, ModelMapper modelMapper, GoodService goodService, SupplierService supplierService, GoodOperationRepository goodOperationRepository) {
         this.goodRepository = goodRepository;
         this.supplierRepository = supplierRepository;
         this.modelMapper = modelMapper;
         this.goodService = goodService;
         this.supplierService = supplierService;
-        this.operationRepository = operationRepository;
+        this.goodOperationRepository = goodOperationRepository;
     }
 
     @GetMapping("/all")
@@ -67,13 +67,6 @@ public class GoodController {
         return goodService.createGoodDTO1(goodDTO);
     }
 
-//    @PostMapping("/create/good")
-//    public Good createGood(@RequestBody Good good) {
-//        Supplier supplier = good.getSupplier();
-//        supplierRepository.save(supplier);
-//        return goodRepository.save(good);
-//    }
-
     @PostMapping("/create/supplier")
     public Supplier createSupplier(@RequestBody SupplierDTO supplierDTO) {
         return supplierService.createSupplier(supplierDTO);
@@ -89,14 +82,18 @@ public class GoodController {
         return goodRepository.getGoodsBySupplierId(id);
     }
 
-//    @GetMapping("/operation")
-//    public java.util.Map<Good,Operation> findOperation(@RequestParam("name") String name) {
-//        List<Operation> operations = operationRepository.findByName(name);
-//        java.util.Map<Good,Operation> goods = new HashMap<>();
-//        for (Operation operation: operations
-//             ) {
-//            goods.add(operation.getGoods());
-//        }
-//
-//    }
+    @GetMapping("/operations")
+    public List<GoodOperation> getGoodOperationsBySupplierName(@RequestParam("supplierName") String supplierName) {
+        return goodOperationRepository.getGoodOperationsBySupplierName(supplierName);
+    }
+
+    @GetMapping("/operation/current")
+    public List<GoodOperation> getGoodOperationsByOperationCurrent(@RequestParam("operationCurrent") String operationCurrent) {
+        return goodOperationRepository.getGoodOperationsByOperationCurrent(operationCurrent);
+    }
+
+    @GetMapping("/operation/date")
+    public List<GoodOperation> getGoodOperationsByOperationCurrent(@RequestParam("dateFrom") Date dateFrom, @RequestParam("dateTo") Date dateTo) {
+        return goodOperationRepository.getGoodOperationsByDate(dateFrom, dateTo);
+    }
 }

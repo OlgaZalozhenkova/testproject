@@ -41,17 +41,7 @@ public class Good {
             inverseJoinColumns = @JoinColumn(name = "supplier_id"))
     private List<Supplier> suppliers;
 
-    @ManyToMany
-    @JoinTable(name = "good_operation",
-            joinColumns = @JoinColumn(name = "good_id"),
-            inverseJoinColumns = @JoinColumn(name = "operation_id"))
-    private List<Operation> operations;
-
     @OneToMany(mappedBy = "good")
     private List<GoodOperation> goodOperations;
 
-    public Good(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
 }
