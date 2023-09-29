@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class GoodService {
 
     @Transactional
     public Good createGood(Good good) {
-
+        String operationCurrent = "supply";
         Supplier supplier = good.getSuppliers().get(0);
         String nameForCheck = good.getName();
         Good goodDB = goodRepository.findByName(nameForCheck);
@@ -44,13 +45,16 @@ public class GoodService {
             if (supplierDB == null) {
                 supplierRepository.save(good.getSuppliers().get(0));
                 goodRepository.save(good);
-                createGoodOperation(good);
+                createGoodOperation(good,operationCurrent);
             } else {
+//                в списке передан только один поставщик
                 List<Supplier> goodSuppliers = good.getSuppliers();
-                goodSuppliers.remove(0);
-                goodSuppliers.add(supplierDB);
+//                замена на сохраненного поставщика
+//                goodSuppliers.remove(0);
+//                goodSuppliers.add(supplierDB);
+                goodSuppliers.set(0, supplierDB);
                 goodRepository.save(good);
-                createGoodOperation(good);
+                createGoodOperation(good, operationCurrent);
             }
             return good;
 
@@ -85,9 +89,9 @@ public class GoodService {
                 suppliersDB.add(supplierForCheck);
                 supplierRepository.saveAll(suppliersDB);
                 goodDB.setSuppliers(suppliersDB);
-                createGoodOperation1(good, goodDB, supplier);
+                createGoodOperation1(good, goodDB, supplier,operationCurrent);
             } else {
-                createGoodOperation1(good, goodDB, supplierDB);
+                createGoodOperation1(good, goodDB, supplierDB,operationCurrent);
 
             }
             return goodDB;
@@ -95,9 +99,9 @@ public class GoodService {
     }
 
     @Transactional
-    public void createGoodOperation(Good good) {
+    public void createGoodOperation(Good good, String operationCurrent) {
         String item = good.getName();
-        String operationCurrent = "supply";
+//        String operationCurrent = "supply";
         int price = good.getPrice();
         int quantity = good.getQuantity();
         Date date = new Date();
@@ -110,9 +114,10 @@ public class GoodService {
     }
 
     @Transactional
-    public void createGoodOperation1(Good good, Good goodDB, Supplier supplierDB) {
+    public void createGoodOperation1(Good good, Good goodDB, Supplier supplierDB,
+                                     String operationCurrent) {
         String item = good.getName();
-        String operationCurrent = "supply";
+//        String operationCurrent = "supply";
         int price = good.getPrice();
         int quantity = good.getQuantity();
         Date date = new Date();
@@ -130,4 +135,58 @@ public class GoodService {
         return goodRepository.save(good);
     }
 
+    @Transactional
+    public List<Good> createGoods(List<Good> goods) {
+        List<Good> savedGoods = new ArrayList<>();
+        for (Good good:goods
+             ) {
+            createGood(good);
+            savedGoods.add(good);
+        }
+        return savedGoods;
+    }
+
+    @Transactional
+    public Good sellGood(Good good) {
+//        ENUM
+        String operationCurrent = "selling";
+        Good goodDB = goodRepository.findByName(good.getName());
+        Supplier supplier = good.getSuppliers().get(0);
+        if (goodDB != null) {
+            int priceNew = 0;
+            int priceDB = goodDB.getPrice();
+            int quantityDB = goodDB.getQuantity();
+
+            if (good.getQuantity() > quantityDB) {
+                return null;
+            }
+
+            int price = good.getPrice();
+            int quantity = good.getQuantity();
+
+            int quantityNew = quantityDB - quantity;
+            if (quantityNew != 0) {
+                priceNew = (priceDB * quantityDB - priceDB * quantity) / quantityNew;
+            }
+            goodDB.setQuantity(quantityNew);
+            goodDB.setPrice(priceNew);
+
+            List<Supplier> suppliersDB = goodDB.getSuppliers();
+            Supplier supplierForCheck = good.getSuppliers().get(0);
+            Supplier supplierDB = supplierRepository.findByName(supplierForCheck.getName());
+
+            if (supplierDB == null) {
+                suppliersDB.add(supplierForCheck);
+                supplierRepository.saveAll(suppliersDB);
+                goodDB.setSuppliers(suppliersDB);
+                createGoodOperation1(good, goodDB, supplier,operationCurrent);
+            } else {
+                createGoodOperation1(good, goodDB, supplierDB, operationCurrent);
+
+            }
+            return good;
+        } else {
+            return null;
+        }
+    }
 }

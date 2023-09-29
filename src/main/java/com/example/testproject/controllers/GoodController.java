@@ -62,6 +62,16 @@ public class GoodController {
         return goodService.createGood(good);
     }
 
+    @PostMapping("/create/goods")
+    public List<Good> createGood(@RequestBody List<Good> goods) {
+        return goodService.createGoods(goods);
+    }
+
+    @PostMapping("/sell/good")
+    public Good sellGood(@RequestBody Good good) {
+        return goodService.sellGood(good);
+    }
+
     @PostMapping("/create/goodDTO")
     public Good createGood(@RequestBody GoodDTO goodDTO) {
         return goodService.createGoodDTO1(goodDTO);

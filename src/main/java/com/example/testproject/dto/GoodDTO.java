@@ -1,6 +1,8 @@
 package com.example.testproject.dto;
 
+import com.example.testproject.models.GoodOperation;
 import com.example.testproject.models.Supplier;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,10 +16,9 @@ import java.util.List;
 @Setter
 public class GoodDTO {
 
-   private String name;
-   private List<Supplier> suppliers;
+    private String name;
+    int price;
+    int quantity;
+    private List<Supplier> suppliers;
 
-    public GoodDTO(String name) {
-        this.name = name;
-    }
 }
