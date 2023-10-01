@@ -31,12 +31,4 @@ public class SupplierService {
         this.modelMapper = modelMapper;
     }
 
-    @Transactional
-    public Supplier createSupplier(SupplierDTO supplierDTO) {
-        Supplier supplier = modelMapper.map(supplierDTO, Supplier.class);
-        List<Good> goods = supplierDTO.getGoods();
-        goodRepository.saveAll(goods);
-        return supplierRepository.save(supplier);
-
-    }
 }

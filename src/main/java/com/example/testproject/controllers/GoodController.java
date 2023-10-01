@@ -1,6 +1,7 @@
 package com.example.testproject.controllers;
 
 import com.example.testproject.dto.GoodDTO;
+import com.example.testproject.dto.GoodDTOCustomer;
 import com.example.testproject.dto.SupplierDTO;
 import com.example.testproject.models.Good;
 import com.example.testproject.models.GoodOperation;
@@ -87,14 +88,14 @@ public class GoodController {
         return goodService.createGoodsDTO(goodsDTO);
     }
 
+    @PostMapping("/create/goodDTOCustomer")
+    public GoodDTOCustomer createGoodDTOCustomer(@RequestBody GoodDTO goodDTO) {
+        return goodService.createGoodDTOCustomer(goodDTO);
+    }
+
     @PostMapping("/sell/goodsDTO")
     public List<Good> sellGoodsDTO(@RequestBody List<GoodDTO> goodsDTO) {
         return goodService.sellGoodsDTO(goodsDTO);
-    }
-
-    @PostMapping("/create/supplier")
-    public Supplier createSupplier(@RequestBody SupplierDTO supplierDTO) {
-        return supplierService.createSupplier(supplierDTO);
     }
 
     @GetMapping("/supplier")

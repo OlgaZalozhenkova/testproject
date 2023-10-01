@@ -1,6 +1,6 @@
 package com.example.testproject.dto;
 
-import com.example.testproject.models.Good;
+import com.example.testproject.models.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +12,12 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-public class SupplierDTO {
+public class GoodDTOCustomer {
+
     private String name;
+    int priceCurrent;
+    int quantityCurrent;
+    int totalSum;
+    private SupplierDTO supplierDTO;
 
 }

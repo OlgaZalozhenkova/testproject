@@ -1,6 +1,8 @@
 package com.example.testproject.servicies;
 
 import com.example.testproject.dto.GoodDTO;
+import com.example.testproject.dto.GoodDTOCustomer;
+import com.example.testproject.dto.SupplierDTO;
 import com.example.testproject.models.Good;
 import com.example.testproject.models.GoodOperation;
 import com.example.testproject.models.Supplier;
@@ -111,6 +113,33 @@ public class GoodService {
     public Good createGoodDTO(GoodDTO goodDTO) {
         Good good = modelMapper.map(goodDTO, Good.class);
         return createGood(good);
+    }
+
+    @Transactional
+    public GoodDTOCustomer createGoodDTOCustomer(GoodDTO goodDTO) {
+        Good good = modelMapper.map(goodDTO, Good.class);
+        Good goodDB = createGood(good);
+        int priceCurrent = goodDTO.getPrice();
+        int quantityCurrent = goodDTO.getQuantity();
+        Supplier supplier = goodDTO.getSuppliers().get(0);
+        SupplierDTO supplierDTO = convertToSupplierDTO(supplier);
+        int totalSum = priceCurrent * quantityCurrent;
+        GoodDTOCustomer goodDTOCustomer = modelMapper.map(good, GoodDTOCustomer.class);
+        enrichGoodDTOCustomer(priceCurrent, quantityCurrent, totalSum, supplierDTO, goodDTOCustomer);
+        return goodDTOCustomer;
+    }
+
+    public void enrichGoodDTOCustomer(int priceCurrent, int quantityCurrent,
+                                      int totalSum, SupplierDTO supplierDTO,
+                                      GoodDTOCustomer goodDTOCustomer) {
+        goodDTOCustomer.setPriceCurrent(priceCurrent);
+        goodDTOCustomer.setQuantityCurrent(quantityCurrent);
+        goodDTOCustomer.setTotalSum(totalSum);
+        goodDTOCustomer.setSupplierDTO(supplierDTO);
+    }
+
+    public SupplierDTO convertToSupplierDTO(Supplier supplier) {
+        return modelMapper.map(supplier, SupplierDTO.class);
     }
 
     @Transactional
