@@ -1,8 +1,6 @@
 package com.example.testproject.dto;
 
-import com.example.testproject.models.GoodOperation;
 import com.example.testproject.models.Supplier;
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

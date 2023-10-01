@@ -34,36 +34,38 @@ public class GoodService {
 
     @Transactional
     public Good createGood(Good good) {
+        String item = good.getName();
         String operationCurrent = "supply";
-        Supplier supplier = good.getSuppliers().get(0);
-        String nameForCheck = good.getName();
-        Good goodDB = goodRepository.findByName(nameForCheck);
+        int price = good.getPrice();
+        int quantity = good.getQuantity();
+        Date date = new Date();
+        String supplierName = good.getSuppliers().get(0).getName();
+
+        String goodNameForCheck = good.getName();
+        Supplier supplierForCheck = good.getSuppliers().get(0);
+        List<Supplier> goodSuppliers = good.getSuppliers();
+
+        Good goodDB = goodRepository.findByName(goodNameForCheck);
+        Supplier supplierDB = supplierRepository.findByName(supplierForCheck.getName());
 
         if (goodDB == null) {
-            Supplier supplierForCheck = good.getSuppliers().get(0);
-            Supplier supplierDB = supplierRepository.findByName(supplierForCheck.getName());
+
             if (supplierDB == null) {
-                supplierRepository.save(good.getSuppliers().get(0));
+                supplierRepository.save(supplierForCheck);
                 goodRepository.save(good);
-                createGoodOperation(good,operationCurrent);
+                createGoodOperation(item, operationCurrent, price,
+                        quantity, supplierName, good, supplierForCheck, date);
             } else {
-//                в списке передан только один поставщик
-                List<Supplier> goodSuppliers = good.getSuppliers();
-//                замена на сохраненного поставщика
-//                goodSuppliers.remove(0);
-//                goodSuppliers.add(supplierDB);
                 goodSuppliers.set(0, supplierDB);
                 goodRepository.save(good);
-                createGoodOperation(good, operationCurrent);
+                createGoodOperation(item, operationCurrent, price,
+                        quantity, supplierName, good, supplierDB, date);
             }
             return good;
 
         } else {
             int priceDB = goodDB.getPrice();
             int quantityDB = goodDB.getQuantity();
-
-            int price = good.getPrice();
-            int quantity = good.getQuantity();
 
             int quantityNew = quantityDB + quantity;
             int priceNew = (priceDB * quantityDB + price * quantity) / quantityNew;
@@ -72,121 +74,143 @@ public class GoodService {
             goodDB.setPrice(priceNew);
 
             List<Supplier> suppliersDB = goodDB.getSuppliers();
-            Supplier supplierForCheck = good.getSuppliers().get(0);
-            Supplier supplierDB = supplierRepository.findByName(supplierForCheck.getName());
-
-/*          если товар существует,изменяю цену и количество,
-            добавляю новую операцию в список Operation (нет поля goodOperations
-            -> нет supplier
-            -> нет supplier id),
-            сохраняю поставщика, назначается id поставщика (нет goodOperations,
-            он создается в конце
-            -> нет связи по supplier id)
-
-            */
 
             if (supplierDB == null) {
+                supplierRepository.save(supplierForCheck);
                 suppliersDB.add(supplierForCheck);
-                supplierRepository.saveAll(suppliersDB);
+//                supplierRepository.saveAll(suppliersDB);
                 goodDB.setSuppliers(suppliersDB);
-                createGoodOperation1(good, goodDB, supplier,operationCurrent);
+                createGoodOperation(item, operationCurrent, price,
+                        quantity, supplierName, goodDB, supplierForCheck, date);
             } else {
-                createGoodOperation1(good, goodDB, supplierDB,operationCurrent);
+                boolean isExist = suppliersDB.contains(supplierDB);
+                if (!isExist) { // в базе есть, а в списке нет
+                    suppliersDB.add(supplierDB);
+                    goodDB.setSuppliers(suppliersDB);
+                }
 
+                // в базе есть, в списке есть
+//                goodRepository.save(goodDB);
+                createGoodOperation(item, operationCurrent, price,
+                        quantity, supplierName, goodDB, supplierDB, date);
             }
             return goodDB;
         }
     }
 
     @Transactional
-    public void createGoodOperation(Good good, String operationCurrent) {
-        String item = good.getName();
-//        String operationCurrent = "supply";
-        int price = good.getPrice();
-        int quantity = good.getQuantity();
-        Date date = new Date();
-        String supplierName = good.getSuppliers().get(0).getName();
-//        поскольку товар новый у него только один поставщик в списке
-        Supplier supplier = good.getSuppliers().get(0);
+    public void createGoodOperation(String item, String operationCurrent, int price,
+                                    int quantity, String supplierName,
+                                    Good good, Supplier supplier, Date date) {
         GoodOperation goodOperation = new GoodOperation(item, operationCurrent,
                 price, quantity, supplierName, good, supplier, date);
         goodOperationRepository.save(goodOperation);
     }
 
     @Transactional
-    public void createGoodOperation1(Good good, Good goodDB, Supplier supplierDB,
-                                     String operationCurrent) {
-        String item = good.getName();
-//        String operationCurrent = "supply";
-        int price = good.getPrice();
-        int quantity = good.getQuantity();
-        Date date = new Date();
-        String supplierName = good.getSuppliers().get(0).getName();
-        GoodOperation goodOperation = new GoodOperation(item, operationCurrent,
-                price, quantity, supplierName, goodDB, supplierDB, date);
-        goodOperationRepository.save(goodOperation);
+    public Good createGoodDTO(GoodDTO goodDTO) {
+        Good good = modelMapper.map(goodDTO, Good.class);
+        return createGood(good);
     }
 
     @Transactional
-    public Good createGoodDTO1(GoodDTO goodDTO) {
-        Good good = modelMapper.map(goodDTO, Good.class);
-        Supplier supplier = good.getSuppliers().get(0);
-        supplierRepository.save(supplier);
-        return goodRepository.save(good);
+    public List<Good> createGoodsDTO(List<GoodDTO> goodsDTO) {
+        List<Good> savedGoods = new ArrayList<>();
+        for (GoodDTO goodDTO : goodsDTO
+        ) {
+            Good good = modelMapper.map(goodDTO, Good.class);
+            savedGoods.add(createGood(good));
+        }
+
+        return savedGoods;
+    }
+
+    @Transactional
+    public List<Good> sellGoodsDTO(List<GoodDTO> goodsDTO) {
+        List<Good> savedGoods = new ArrayList<>();
+        for (GoodDTO goodDTO : goodsDTO
+        ) {
+            Good good = modelMapper.map(goodDTO, Good.class);
+            savedGoods.add(sellGood(good));
+        }
+
+        return savedGoods;
     }
 
     @Transactional
     public List<Good> createGoods(List<Good> goods) {
         List<Good> savedGoods = new ArrayList<>();
-        for (Good good:goods
-             ) {
-            createGood(good);
-            savedGoods.add(good);
+        for (Good good : goods
+        ) {
+            savedGoods.add(createGood(good));
+
         }
         return savedGoods;
     }
 
     @Transactional
     public Good sellGood(Good good) {
-//        ENUM
+
+        String item = good.getName();
         String operationCurrent = "selling";
+        int price = good.getPrice();
+        int quantity = good.getQuantity();
+        Date date = new Date();
+        String supplierName = good.getSuppliers().get(0).getName();
+
         Good goodDB = goodRepository.findByName(good.getName());
-        Supplier supplier = good.getSuppliers().get(0);
+
         if (goodDB != null) {
             int priceNew = 0;
             int priceDB = goodDB.getPrice();
             int quantityDB = goodDB.getQuantity();
 
-            if (good.getQuantity() > quantityDB) {
+            if (good.getQuantity() > quantityDB) { // не хватает количества товаров
                 return null;
             }
-
-            int price = good.getPrice();
-            int quantity = good.getQuantity();
 
             int quantityNew = quantityDB - quantity;
             if (quantityNew != 0) {
                 priceNew = (priceDB * quantityDB - priceDB * quantity) / quantityNew;
-            }
-            goodDB.setQuantity(quantityNew);
-            goodDB.setPrice(priceNew);
+            } // если количество 0, то цена 0 остается
+            goodDB.setQuantity(quantityNew);// для количества > 0 и количества = 0
+            goodDB.setPrice(priceNew);// для количества > 0 и количества = 0
 
             List<Supplier> suppliersDB = goodDB.getSuppliers();
             Supplier supplierForCheck = good.getSuppliers().get(0);
             Supplier supplierDB = supplierRepository.findByName(supplierForCheck.getName());
 
             if (supplierDB == null) {
+                supplierRepository.save(supplierForCheck);
                 suppliersDB.add(supplierForCheck);
-                supplierRepository.saveAll(suppliersDB);
+//                supplierRepository.saveAll(suppliersDB);
                 goodDB.setSuppliers(suppliersDB);
-                createGoodOperation1(good, goodDB, supplier,operationCurrent);
+                createGoodOperation(item, operationCurrent, price,
+                        quantity, supplierName, goodDB, supplierForCheck, date);
             } else {
-                createGoodOperation1(good, goodDB, supplierDB, operationCurrent);
+                boolean isExist = suppliersDB.contains(supplierDB);
+                if (!isExist) { // в базе есть, а в списке нет
+                    suppliersDB.add(supplierDB);
+                    goodDB.setSuppliers(suppliersDB);
+                }
 
+                createGoodOperation(item, operationCurrent, price,
+                        quantity, supplierName, goodDB, supplierDB, date);
             }
-            return good;
+            return goodDB; //данные без измененного количества
         } else {
-            return null;
+            return null; // товар не существует
         }
+    }
+
+    @Transactional
+    public List<Good> sellGoods(List<Good> goods) {
+        List<Good> savedGoods = new ArrayList<>();
+        for (Good good : goods
+        ) {
+            savedGoods.add(sellGood(good));
+
+        }
+        return savedGoods;
     }
 }

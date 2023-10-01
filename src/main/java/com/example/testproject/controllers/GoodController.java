@@ -63,8 +63,13 @@ public class GoodController {
     }
 
     @PostMapping("/create/goods")
-    public List<Good> createGood(@RequestBody List<Good> goods) {
+    public List<Good> createGoods(@RequestBody List<Good> goods) {
         return goodService.createGoods(goods);
+    }
+
+    @PostMapping("/sell/goods")
+    public List<Good> sellGoods(@RequestBody List<Good> goods) {
+        return goodService.sellGoods(goods);
     }
 
     @PostMapping("/sell/good")
@@ -74,7 +79,17 @@ public class GoodController {
 
     @PostMapping("/create/goodDTO")
     public Good createGood(@RequestBody GoodDTO goodDTO) {
-        return goodService.createGoodDTO1(goodDTO);
+        return goodService.createGoodDTO(goodDTO);
+    }
+
+    @PostMapping("/create/goodsDTO")
+    public List<Good> createGoodDTO(@RequestBody List<GoodDTO> goodsDTO) {
+        return goodService.createGoodsDTO(goodsDTO);
+    }
+
+    @PostMapping("/sell/goodsDTO")
+    public List<Good> sellGoodsDTO(@RequestBody List<GoodDTO> goodsDTO) {
+        return goodService.sellGoodsDTO(goodsDTO);
     }
 
     @PostMapping("/create/supplier")
