@@ -1,8 +1,6 @@
 package com.example.testproject.controllers;
 
-import com.example.testproject.dto.GoodDTO;
-import com.example.testproject.dto.GoodDTOCustomer;
-import com.example.testproject.dto.SupplierDTO;
+import com.example.testproject.dto.*;
 import com.example.testproject.models.Good;
 import com.example.testproject.models.GoodOperation;
 import com.example.testproject.models.Supplier;
@@ -63,41 +61,16 @@ public class GoodController {
         return goodService.createGood(good);
     }
 
-    @PostMapping("/create/goods")
-    public List<Good> createGoods(@RequestBody List<Good> goods) {
-        return goodService.createGoods(goods);
-    }
-
-    @PostMapping("/sell/goods")
-    public List<Good> sellGoods(@RequestBody List<Good> goods) {
-        return goodService.sellGoods(goods);
-    }
-
     @PostMapping("/sell/good")
     public Good sellGood(@RequestBody Good good) {
         return goodService.sellGood(good);
     }
 
-    @PostMapping("/create/goodDTO")
-    public Good createGood(@RequestBody GoodDTO goodDTO) {
-        return goodService.createGoodDTO(goodDTO);
+    @PostMapping("/operation")
+    public GoodDTOOperation1 createGoodDTOOperation1(@RequestParam("operation") String operation
+            ,@RequestBody List<GoodDTO1> goodsDTO1) {
+        return goodService.createGoodsDTOOperation1(goodsDTO1,operation);
     }
-
-    @PostMapping("/create/goodsDTO")
-    public List<Good> createGoodDTO(@RequestBody List<GoodDTO> goodsDTO) {
-        return goodService.createGoodsDTO(goodsDTO);
-    }
-
-    @PostMapping("/create/goodDTOCustomer")
-    public GoodDTOCustomer createGoodDTOCustomer(@RequestBody GoodDTO goodDTO) {
-        return goodService.createGoodDTOCustomer(goodDTO);
-    }
-
-    @PostMapping("/sell/goodsDTO")
-    public List<Good> sellGoodsDTO(@RequestBody List<GoodDTO> goodsDTO) {
-        return goodService.sellGoodsDTO(goodsDTO);
-    }
-
     @GetMapping("/supplier")
     public Supplier findByName(@RequestParam("name") String name) {
         return supplierRepository.findByName(name);
@@ -122,4 +95,34 @@ public class GoodController {
     public List<GoodOperation> getGoodOperationsByOperationCurrent(@RequestParam("dateFrom") Date dateFrom, @RequestParam("dateTo") Date dateTo) {
         return goodOperationRepository.getGoodOperationsByDate(dateFrom, dateTo);
     }
+
+    @PostMapping("/create/goods")
+    public List<Good> createGoods(@RequestBody List<Good> goods) {
+        return goodService.createGoods(goods);
+    }
+//
+//    @PostMapping("/sell/goods")
+//    public List<Good> sellGoods(@RequestBody List<Good> goods) {
+//        return goodService.sellGoods(goods);
+//    }
+
+    //    @PostMapping("/create/goodDTOCustomer")
+//    public GoodDTOCustomer createGoodDTOCustomer(@RequestBody GoodDTO goodDTO) {
+//        return goodService.createGoodDTOCustomer(goodDTO);
+//    }
+
+//    @PostMapping("/sell/goodsDTO")
+//    public List<Good> sellGoodsDTO(@RequestBody List<GoodDTO> goodsDTO) {
+//        return goodService.sellGoodsDTO(goodsDTO);
+//    }
+
+    //    @PostMapping("/create/goodsDTOOperation")
+//    public GoodDTOOperation createGoodDTOOperation(@RequestBody List<GoodDTO> goodsDTO) {
+//        return goodService.createGoodsDTOOperation(goodsDTO);
+//    }
+
+//    @PostMapping("/create/goodsDTOCustomer")
+//    public List<GoodDTOCustomer> createGoodDTO(@RequestBody List<GoodDTO> goodsDTO) {
+//        return goodService.createGoodsDTOCustomer(goodsDTO);
+//    }
 }
