@@ -33,7 +33,7 @@ public class Supplier {
     @JsonManagedReference
     private List<Good> goods;
 
-  //  @JsonIgnore
+    @JsonIgnore
     @OneToMany(mappedBy = "supplier")
     private List<GoodOperation> goodOperations;
 

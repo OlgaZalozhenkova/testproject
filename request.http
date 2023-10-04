@@ -1,3 +1,7 @@
+GET http://localhost:1107/good/good/card/good5
+Accept: application/json
+
+###
 POST localhost:1093/good/create/change/goodcard
 Content-Type: application/json
 

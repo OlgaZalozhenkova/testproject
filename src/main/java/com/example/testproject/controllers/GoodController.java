@@ -5,6 +5,7 @@ import com.example.testproject.models.Good;
 import com.example.testproject.models.GoodCard;
 import com.example.testproject.models.GoodOperation;
 import com.example.testproject.models.Supplier;
+import com.example.testproject.repositories.GoodCardRepository;
 import com.example.testproject.repositories.GoodOperationRepository;
 import com.example.testproject.repositories.GoodRepository;
 import com.example.testproject.repositories.SupplierRepository;
@@ -27,15 +28,22 @@ public class GoodController {
     GoodService goodService;
     SupplierService supplierService;
     GoodOperationRepository goodOperationRepository;
+    GoodCardRepository goodCardRepository;
 
     @Autowired
-    public GoodController(GoodRepository goodRepository, SupplierRepository supplierRepository, ModelMapper modelMapper, GoodService goodService, SupplierService supplierService, GoodOperationRepository goodOperationRepository) {
+    public GoodController(GoodRepository goodRepository, SupplierRepository supplierRepository, ModelMapper modelMapper, GoodService goodService, SupplierService supplierService, GoodOperationRepository goodOperationRepository, GoodCardRepository goodCardRepository) {
         this.goodRepository = goodRepository;
         this.supplierRepository = supplierRepository;
         this.modelMapper = modelMapper;
         this.goodService = goodService;
         this.supplierService = supplierService;
         this.goodOperationRepository = goodOperationRepository;
+        this.goodCardRepository = goodCardRepository;
+    }
+
+    @GetMapping("/good/card/{name}")
+    public GoodCard findGoodCardByGoodId (@PathVariable("name") String name) {
+        return goodCardRepository.findGoodCardByGoodId(name);
     }
 
     @GetMapping("/all")

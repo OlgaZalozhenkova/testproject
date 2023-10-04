@@ -59,7 +59,7 @@ public class Good {
     @JoinColumn(name = "good_card_id", referencedColumnName = "id")
     private GoodCard goodCard;
 
-    public Good(int id) {
-        this.id = id;
-    }
+//    public Good(int id) {
+//        this.id = id;
+//    }
 }
