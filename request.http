@@ -1,16 +1,48 @@
-GET http://localhost:80/api/item?id=99
+POST localhost:1093/good/create/change/goodcard
+Content-Type: application/json
+
+{
+  "name": "good1",
+  "priceSupply": 15,
+  "priceSelling": 16,
+  "availableQuantity": 0,
+  "sellQuantity": 0
+}
+
+###
+GET http://localhost:1090/good/sell/good/quantity?supply=supply&item=good1
 Accept: application/json
 
 ###
-GET http://localhost:80/api/item?id=99
+GET http://localhost:1088/good/supplier/name?name=good1
 Accept: application/json
 
 ###
-GET http://localhost:1044/good/query/88
+GET http://localhost:1087/good/operation/item/date?item=good1&date=2023/10/02
 Accept: application/json
 
 ###
-GET http://localhost:1036/good/supplier?name=Pushkin
+GET http://localhost:1087/good/query/name?name=supplier2
+Accept: application/json
+
+###
+GET http://localhost:1082/good/operation/supplier/date
+Accept: application/json
+
+###
+GET http://localhost:1086/good/operation/supplier/date?operationCurrent=supply&supplierName=supplier2&dateFrom=2023/01/01&dateTo=2023/10/30
+Accept: application/json
+
+###
+GET http://localhost:1081/good/operation/supplier?operationCurrent=supply&supplierName=supplier3
+Accept: application/json
+
+###
+GET http://localhost:1081/good/operation/current?operationCurrent=supply
+Accept: application/json
+
+###
+GET http://localhost:1080/good/supplier?name=supplier3
 Accept: application/json
 
 ###

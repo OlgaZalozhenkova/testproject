@@ -44,6 +44,12 @@ public class GoodOperation {
     @Column(name = "date")
     Date date;
 
+    @Column(name = "price_db")
+    int priceDB;
+
+    @Column(name = "quantity_db")
+    int quantityDB;
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "good_id", referencedColumnName = "id")
@@ -54,7 +60,7 @@ public class GoodOperation {
     @JoinColumn(name = "supplier_id", referencedColumnName = "id")
     private Supplier supplier;
 
-    public GoodOperation(String item, String operationCurrent, int price, int quantity, String supplierName, Good good, Supplier supplier, Date date) {
+    public GoodOperation(String item, String operationCurrent, int price, int quantity, String supplierName, Good good, Supplier supplier, Date date, int priceDB, int quantityDB) {
         this.item = item;
         this.operationCurrent = operationCurrent;
         this.price = price;
@@ -63,5 +69,7 @@ public class GoodOperation {
         this.good = good;
         this.supplier = supplier;
         this.date = date;
+        this.priceDB = priceDB;
+        this.quantityDB = quantityDB;
     }
 }

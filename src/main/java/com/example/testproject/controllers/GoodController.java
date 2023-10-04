@@ -2,6 +2,7 @@ package com.example.testproject.controllers;
 
 import com.example.testproject.dto.*;
 import com.example.testproject.models.Good;
+import com.example.testproject.models.GoodCard;
 import com.example.testproject.models.GoodOperation;
 import com.example.testproject.models.Supplier;
 import com.example.testproject.repositories.GoodOperationRepository;
@@ -41,6 +42,12 @@ public class GoodController {
     public List<Good> findAll() {
         return goodRepository.findAll();
     }
+
+    @GetMapping("/all/operations")
+    public List<GoodOperation> findAllOperations() {
+        return goodOperationRepository.findAll();
+    }
+
     @GetMapping("/item/{id}")
     public Good findGood(@PathVariable("id") int id) {
         return goodRepository.getGoodByIdQuery(id);
@@ -54,6 +61,11 @@ public class GoodController {
     @GetMapping("/supplier/{id}")
     public Supplier findSupplier(@PathVariable("id") int id) {
         return supplierRepository.getSupplierByIdQuery(id);
+    }
+
+    @GetMapping("/supplier/name")
+    public List<Supplier> findSupplier(@RequestParam("name") String name) {
+        return supplierRepository.getSuppliers(name);
     }
 
     @PostMapping("/create/good")
@@ -81,14 +93,45 @@ public class GoodController {
         return goodRepository.getGoodsBySupplierId(id);
     }
 
+    @GetMapping("/query/name")
+    public List<Good> query(@RequestParam("name") String name) {
+        return goodRepository.getGoodsBySupplierName(name);
+    }
+
     @GetMapping("/operations")
     public List<GoodOperation> getGoodOperationsBySupplierName(@RequestParam("supplierName") String supplierName) {
         return goodOperationRepository.getGoodOperationsBySupplierName(supplierName);
     }
 
-    @GetMapping("/operation/current")
-    public List<GoodOperation> getGoodOperationsByOperationCurrent(@RequestParam("operationCurrent") String operationCurrent) {
-        return goodOperationRepository.getGoodOperationsByOperationCurrent(operationCurrent);
+    @PostMapping("/create/change/goodcard")
+    public GoodCard createOrChangeGoodCard(@RequestBody GoodCard goodCard) {
+        return goodService.createOrChangeGoodCard1(goodCard);
+    }
+
+    @GetMapping("/sell/good/quantity")
+    public List<GoodOperation> getSellQuantity(@RequestParam("supply") String supply
+            , @RequestParam("item") String item) {
+        return goodOperationRepository
+                .getSellQuantity(supply, item);
+    }
+
+    @GetMapping("/operation/supplier")
+    public List<GoodOperation> getGoodOperationsByOperationAndSupplierName(@RequestParam("operationCurrent") String operationCurrent, @RequestParam("supplierName") String supplierName) {
+        return goodOperationRepository.getGoodOperationsByOperationAndSupplierName(operationCurrent, supplierName);
+    }
+
+    @GetMapping("/operation/item/date")
+    public List<GoodOperation> getGoodOperationsByItemAndDate(@RequestParam("item") String item, @RequestParam("date") Date date) {
+        return goodOperationRepository.getGoodOperationsByItemAndDate(item, date);
+    }
+
+    @GetMapping("/operation/supplier/date")
+    public List<GoodOperation> geOperationsByOperationAndSupplierNameAndDate(
+            @RequestParam("operationCurrent") String operationCurrent,
+            @RequestParam("supplierName") String supplierName,
+            @RequestParam("dateFrom") Date dateFrom, @RequestParam("dateTo") Date dateTo) {
+        return goodOperationRepository.getOperationsByOperationAndSupplierNameAndDate(operationCurrent,
+                supplierName, dateFrom, dateTo);
     }
 
     @GetMapping("/operation/date")
@@ -124,5 +167,13 @@ public class GoodController {
 //    @PostMapping("/create/goodsDTOCustomer")
 //    public List<GoodDTOCustomer> createGoodDTO(@RequestBody List<GoodDTO> goodsDTO) {
 //        return goodService.createGoodsDTOCustomer(goodsDTO);
+//    }
+
+    //    @GetMapping("/sell/good/quantity")
+//    public List<GoodOperation> getGoodOperationsByOperationCurrent
+//            (@RequestParam("operationcurrent") String operationCurrent
+//            , @RequestParam("goodname") String supplierName) {
+//        return goodOperationRepository
+//                .getSellQuantity(operationCurrent,supplierName);
 //    }
 }

@@ -5,9 +5,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface SupplierRepository extends JpaRepository<Supplier,Integer> {
+
     @Query("select s from Supplier s where s.id = :id")
     Supplier getSupplierByIdQuery(int id);
+
+    @Query("select s from Supplier s join s.goods good where good.name = :name")
+    List<Supplier> getSuppliers(String name);
+
     Supplier findByName(String name);
 }

@@ -1,6 +1,7 @@
 package com.example.testproject.models;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -32,16 +33,33 @@ public class Good {
     @Column(name = "price")
     int price;
 
-    @Column(name ="quantity")
+    @Column(name = "quantity")
     int quantity;
 
+//    @Column(name="sell_quantity")
+//    int sellQuantity;
+
+    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "good_supplier",
             joinColumns = @JoinColumn(name = "good_id"),
             inverseJoinColumns = @JoinColumn(name = "supplier_id"))
     private List<Supplier> suppliers;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "good")
     private List<GoodOperation> goodOperations;
 
+//    @JsonIgnore
+//    @OneToOne(mappedBy = "good")
+//    private GoodCard goodCard;
+
+    @JsonIgnore
+    @OneToOne
+    @JoinColumn(name = "good_card_id", referencedColumnName = "id")
+    private GoodCard goodCard;
+
+    public Good(int id) {
+        this.id = id;
+    }
 }
