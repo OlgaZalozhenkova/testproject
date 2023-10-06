@@ -1,12 +1,9 @@
 package com.example.testproject.dto;
 
-import com.example.testproject.models.Good;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor

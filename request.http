@@ -5,7 +5,7 @@ Accept: application/json
 
 
 ###
-POST http://localhost:1123/good/set/rating?operationCurrent=supply&supplierName=supplier3&item=good3&value=5
+POST http://localhost:1126/good/set/rating?operationCurrent=selling&supplierName=supplier5&item=good2&value=4
 Content-Type: application/json
 
 {}

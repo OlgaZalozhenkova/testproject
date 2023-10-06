@@ -45,6 +45,9 @@ public class GoodCard {
     @Column(name ="rating")
     double rating;
 
+    @Column(name = "count_value")
+    double countValue;
+
 //    @JsonIgnore
 //    @OneToOne
 //    @JoinColumn(name = "good_id", referencedColumnName = "id")

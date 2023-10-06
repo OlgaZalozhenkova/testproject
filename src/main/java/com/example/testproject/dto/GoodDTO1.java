@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -15,8 +13,8 @@ import java.util.List;
 public class GoodDTO1 {
 
     private String name;
-    int price;
-    int quantity;
-    Supplier supplier;
+    private int price;
+    private int quantity;
+    private Supplier supplier;
 
 }

@@ -227,34 +227,87 @@ public class GoodService {
         }
     }
 
+    //    @Transactional
+//    // установить ограничения по рейтингу диапазон оценок
+//    //поля не должны быть пустыми
+//    // метод только для купленных товаров, оценивать не купленные товары не нужно
+//    public Rating setRating(String operationCurrent, String supplierName, String item, double value) {
+//
+////        Rating ratingDB = ratingRepository1.
+////                findByGoodAndSupplier(supplierName, item).orElse(null);
+//        Good good = goodRepository.findByName(item);
+//        Supplier supplier = supplierRepository.findByName(supplierName);
+//        Rating ratingDB = ratingRepository1.findBySupplierAndGood(supplier,good);
+//        if (ratingDB == null) {
+//            Supplier supplierDB = supplierRepository.findByName(supplierName);
+//            // товар именно купленный этим контрагентом
+//            Good goodForSetRating = goodRepository
+//                    .getGoodForRating(operationCurrent, supplierName, item);
+//
+//            if (supplierDB == null || !operationCurrent.equals("selling")
+//                    || goodForSetRating == null) {
+//                return null; // исключение
+//            }
+//
+//            Rating ratingNew = new Rating(value, item, goodForSetRating, supplierDB);
+//            ratingRepository1.save(ratingNew);
+//            GoodCard goodCard = goodCardRepository.findByName(item);
+//
+//            double rating = goodCard.getRating();
+//            double countValue = goodCard.getCountValue();
+//
+//            double countValueNew = countValue+1;
+//            double ratingNewGoodCard = (rating+value)/countValueNew;
+//
+//            goodCard.setRating(ratingNewGoodCard);
+//            goodCard.setCountValue(countValueNew);
+//            goodCardRepository.save(goodCard);
+//            return ratingNew;
+//        }
+//        else return null;
+//    }
     @Transactional
-    // установить ограничения по рейтингу диапазон оценок
-    //поля не должны быть пустыми
-    // метод только для купленных товаров, оценивать не купленные товары не нужно
-    public Rating setRating(String operationCurrent, String supplierName, String item, double value) {
+    public RatingDTOForCustomer setRating1(RatingDTO ratingDTO) {
 
-//        Rating ratingDB = ratingRepository1.
-//                findByGoodAndSupplier(supplierName, item).orElse(null);
-        Good good = goodRepository.findByName(item);
-        Supplier supplier = supplierRepository.findByName(supplierName);
-        Rating ratingDB = ratingRepository1.findBySupplierAndGood(supplier,good);
-        if (ratingDB == null) {
-            Supplier supplierDB = supplierRepository.findByName(supplierName);
+        String sellerName = ratingDTO.getSellerName();
+        String goodName = ratingDTO.getGoodName();
+
+        Good good = goodRepository.findByName(goodName);
+        Supplier supplier = supplierRepository.findByName(sellerName);
+        Rating ratingExistDB = ratingRepository1.findBySupplierAndGood(supplier, good);
+
+        if (ratingExistDB == null) {
             // товар именно купленный этим контрагентом
             Good goodForSetRating = goodRepository
-                    .getGoodForRating(operationCurrent, supplierName, item);
-//исправить на selling
-            if (supplierDB == null || !operationCurrent.equals("supply")
-                    || goodForSetRating == null) {
+                    .getGoodForRating("selling", sellerName, goodName);
+
+            if (supplier == null || goodForSetRating == null) {
                 return null; // исключение
             }
+            Rating rating = modelMapper.map(ratingDTO, Rating.class);
+            rating.setGood(goodForSetRating);
+            rating.setSupplier(supplier);
 
-            Rating ratingNew = new Rating(value, item, goodForSetRating, supplierDB);
-            ratingRepository1.save(ratingNew);
-            goodCardRepository.set
-            return ratingNew;
-        }
-        else return null;
+            ratingRepository1.save(rating);
+            GoodCard goodCard = goodCardRepository.findByName(goodName);
+
+            double ratingDB = goodCard.getRating();
+            double countValue = goodCard.getCountValue();
+
+            double countValueNew = countValue + 1;
+            double value = ratingDTO.getValue();
+            double ratingNewGoodCard = (ratingDB + value) / countValueNew;
+
+            goodCard.setRating(ratingNewGoodCard);
+            goodCard.setCountValue(countValueNew);
+
+            goodCardRepository.save(goodCard);
+
+            RatingDTOForCustomer ratingDTOForCustomer = modelMapper.map(rating,
+                    RatingDTOForCustomer.class);
+            ratingDTOForCustomer.setMessage("Your evaluation is " + value);
+            return ratingDTOForCustomer;
+        } else return null;
     }
 
     @Transactional

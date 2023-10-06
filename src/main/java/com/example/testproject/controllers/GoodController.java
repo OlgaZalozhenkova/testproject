@@ -38,12 +38,17 @@ public class GoodController {
         this.ratingRepository1 = ratingRepository1;
     }
 
+//    @PostMapping("/set/rating")
+//    public Rating setRating(@RequestParam("operationCurrent") String operationCurrent
+//            , @RequestParam("supplierName") String supplierName,
+//                            @RequestParam("item") String item,
+//                            @RequestParam("value") double value) {
+//        return goodService.setRating(operationCurrent, supplierName, item, value);
+//    }
+
     @PostMapping("/set/rating")
-    public Rating setRating(@RequestParam("operationCurrent") String operationCurrent
-            , @RequestParam("supplierName") String supplierName,
-                            @RequestParam("item") String item,
-                            @RequestParam("value") double value) {
-        return goodService.setRating(operationCurrent, supplierName, item, value);
+    public RatingDTOForCustomer setRating(@RequestBody RatingDTO ratingDTO) {
+        return goodService.setRating1(ratingDTO);
     }
 
     @GetMapping("/get/for/rating1")
