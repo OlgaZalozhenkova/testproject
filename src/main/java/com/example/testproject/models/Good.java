@@ -36,9 +36,6 @@ public class Good {
     @Column(name = "quantity")
     int quantity;
 
-//    @Column(name="sell_quantity")
-//    int sellQuantity;
-
     @JsonIgnore
     @ManyToMany
     @JoinTable(name = "good_supplier",
@@ -59,7 +56,8 @@ public class Good {
     @JoinColumn(name = "good_card_id", referencedColumnName = "id")
     private GoodCard goodCard;
 
-//    public Good(int id) {
-//        this.id = id;
-//    }
+    @JsonIgnore
+    @OneToMany(mappedBy = "good")
+    List<Rating> ratings;
+
 }

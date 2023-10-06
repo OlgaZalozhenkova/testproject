@@ -1,8 +1,5 @@
 package com.example.testproject.servicies;
 
-import com.example.testproject.dto.SupplierDTO;
-import com.example.testproject.models.Good;
-import com.example.testproject.models.Supplier;
 import com.example.testproject.repositories.GoodRepository;
 import com.example.testproject.repositories.SupplierRepository;
 import lombok.Getter;
@@ -11,8 +8,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Getter
@@ -30,5 +25,4 @@ public class SupplierService {
         this.goodRepository = goodRepository;
         this.modelMapper = modelMapper;
     }
-
 }

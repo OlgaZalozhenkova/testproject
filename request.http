@@ -1,3 +1,24 @@
+GET http://localhost:1122/good/get/for/rating1?goodName=good3&supplierName=supplier3
+Accept: application/json
+
+###
+
+
+###
+POST http://localhost:1123/good/set/rating?operationCurrent=supply&supplierName=supplier3&item=good3&value=5
+Content-Type: application/json
+
+{}
+
+###
+GET http://localhost:1114/good/get/for/rating?operationCurrent=supply&supplierName=supplier3&item=good3
+Accept: application/json
+
+###
+GET http://localhost:1110/good/good/card?supplierName=supplier3&operationCurrent=supply
+Accept: application/json
+
+###
 GET http://localhost:1107/good/good/card/good5
 Accept: application/json
 

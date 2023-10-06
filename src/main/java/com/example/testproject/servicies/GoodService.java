@@ -1,14 +1,8 @@
 package com.example.testproject.servicies;
 
 import com.example.testproject.dto.*;
-import com.example.testproject.models.Good;
-import com.example.testproject.models.GoodCard;
-import com.example.testproject.models.GoodOperation;
-import com.example.testproject.models.Supplier;
-import com.example.testproject.repositories.GoodCardRepository;
-import com.example.testproject.repositories.GoodOperationRepository;
-import com.example.testproject.repositories.GoodRepository;
-import com.example.testproject.repositories.SupplierRepository;
+import com.example.testproject.models.*;
+import com.example.testproject.repositories.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,14 +20,16 @@ public class GoodService {
     ModelMapper modelMapper;
     GoodOperationRepository goodOperationRepository;
     GoodCardRepository goodCardRepository;
+    RatingRepository1 ratingRepository1;
 
     @Autowired
-    public GoodService(GoodRepository goodRepository, SupplierRepository supplierRepository, ModelMapper modelMapper, GoodOperationRepository goodOperationRepository, GoodCardRepository goodCardRepository) {
+    public GoodService(GoodRepository goodRepository, SupplierRepository supplierRepository, ModelMapper modelMapper, GoodOperationRepository goodOperationRepository, GoodCardRepository goodCardRepository, RatingRepository1 ratingRepository1) {
         this.goodRepository = goodRepository;
         this.supplierRepository = supplierRepository;
         this.modelMapper = modelMapper;
         this.goodOperationRepository = goodOperationRepository;
         this.goodCardRepository = goodCardRepository;
+        this.ratingRepository1 = ratingRepository1;
     }
 
     @Transactional
@@ -231,98 +227,43 @@ public class GoodService {
         }
     }
 
-//    @Transactional
-//    public GoodDTOCustomer createGoodDTOCustomer(GoodDTO goodDTO) {
-//        Good good = modelMapper.map(goodDTO, Good.class);
-//
-//        createGood(good);
-//
-//        int priceCurrent = goodDTO.getPrice();
-//        int quantityCurrent = goodDTO.getQuantity();
-//        Supplier supplier = goodDTO.getSuppliers().get(0);
-//
-//        SupplierDTO supplierDTO = convertToSupplierDTO(supplier);
-//        int totalSum = priceCurrent * quantityCurrent;
-//        GoodDTOCustomer goodDTOCustomer = modelMapper.map(good, GoodDTOCustomer.class);
-//        enrichGoodDTOCustomer(priceCurrent, quantityCurrent, totalSum, supplierDTO, goodDTOCustomer);
-//        return goodDTOCustomer;
-//    }
+    @Transactional
+    // установить ограничения по рейтингу диапазон оценок
+    //поля не должны быть пустыми
+    // метод только для купленных товаров, оценивать не купленные товары не нужно
+    public Rating setRating(String operationCurrent, String supplierName, String item, double value) {
 
-    //    @Transactional
-//    public List<GoodDTOCustomer> createGoodsDTOCustomer(List<GoodDTO> goodsDTO) {
-//        List<GoodDTOCustomer> savedGoods = new ArrayList<>();
-//        for (GoodDTO goodDTO : goodsDTO
-//        ) {
-//            savedGoods.add(createGoodDTOCustomer(goodDTO));
-//        }
-//        return savedGoods;
-//    }
+//        Rating ratingDB = ratingRepository1.
+//                findByGoodAndSupplier(supplierName, item).orElse(null);
+        Good good = goodRepository.findByName(item);
+        Supplier supplier = supplierRepository.findByName(supplierName);
+        Rating ratingDB = ratingRepository1.findBySupplierAndGood(supplier,good);
+        if (ratingDB == null) {
+            Supplier supplierDB = supplierRepository.findByName(supplierName);
+            // товар именно купленный этим контрагентом
+            Good goodForSetRating = goodRepository
+                    .getGoodForRating(operationCurrent, supplierName, item);
+//исправить на selling
+            if (supplierDB == null || !operationCurrent.equals("supply")
+                    || goodForSetRating == null) {
+                return null; // исключение
+            }
 
-    //    public SupplierDTO convertToSupplierDTO(Supplier supplier) {
-//        return modelMapper.map(supplier, SupplierDTO.class);
-//    }
+            Rating ratingNew = new Rating(value, item, goodForSetRating, supplierDB);
+            ratingRepository1.save(ratingNew);
+            goodCardRepository.set
+            return ratingNew;
+        }
+        else return null;
+    }
 
-//    public void enrichGoodDTOCustomer(int priceCurrent, int quantityCurrent,
-//                                      int totalSum, SupplierDTO supplierDTO,
-//                                      GoodDTOCustomer goodDTOCustomer) {
-//        goodDTOCustomer.setPriceCurrent(priceCurrent);
-//        goodDTOCustomer.setQuantityCurrent(quantityCurrent);
-//        goodDTOCustomer.setTotalSum(totalSum);
-//        goodDTOCustomer.setSupplierDTO(supplierDTO);
-//    }
-//
-//
-//    @Transactional
-//    public GoodDTOOperation createGoodsDTOOperation(List<GoodDTO> goodsDTO) {
-//        List<GoodDTOCustomer> goodDTOCustomerList = new ArrayList<>();
-//        int totalSum = 0;
-//        for (GoodDTO goodDTO : goodsDTO
-//        ) {
-//            goodDTOCustomerList.add(createGoodDTOCustomer(goodDTO));
-//            totalSum = totalSum + goodDTO.getPrice() * goodDTO.getQuantity();
-//        }
-//        return new GoodDTOOperation(goodDTOCustomerList, totalSum);
-//    }
-
-    //    @Transactional
-//    public void createGoods1(List<Good> goods) {
-//        for (Good good : goods) {
-//            createGood(good);
-//        }
-//    }
-//
-//    @Transactional
-//    public List<Good> sellGoodsDTO(List<GoodDTO> goodsDTO) {
-//        List<Good> savedGoods = new ArrayList<>();
-//        for (GoodDTO goodDTO : goodsDTO
-//        ) {
-//            Good good = modelMapper.map(goodDTO, Good.class);
-//            savedGoods.add(sellGood(good));
-//        }
-//
-//        return savedGoods;
-//    }
-//
     @Transactional
     public List<Good> createGoods(List<Good> goods) {
         List<Good> savedGoods = new ArrayList<>();
         for (Good good : goods
         ) {
             savedGoods.add(createGood(good));
-
         }
         return savedGoods;
     }
-
-//    @Transactional
-//    public List<Good> sellGoods(List<Good> goods) {
-//        List<Good> savedGoods = new ArrayList<>();
-//        for (Good good : goods
-//        ) {
-//            savedGoods.add(sellGood(good));
-//
-//        }
-//        return savedGoods;
-//    }
-
 }

@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -40,6 +42,9 @@ public class GoodCard {
     @Column(name = "sell_quantity")
     int sellQuantity;
 
+    @Column(name ="rating")
+    double rating;
+
 //    @JsonIgnore
 //    @OneToOne
 //    @JoinColumn(name = "good_id", referencedColumnName = "id")
@@ -49,7 +54,7 @@ public class GoodCard {
     @OneToOne(mappedBy = "goodCard")
     Good good;
 
-        public GoodCard(int id, String name, int priceSupply, int priceSelling, int availableQuantity, int sellQuantity) {
+    public GoodCard(int id, String name, int priceSupply, int priceSelling, int availableQuantity, int sellQuantity) {
         this.id = id;
         this.name = name;
         this.priceSupply = priceSupply;
@@ -57,7 +62,8 @@ public class GoodCard {
         this.availableQuantity = availableQuantity;
         this.sellQuantity = sellQuantity;
     }
-    public GoodCard(String name, int priceSupply, int priceSelling, int availableQuantity, int sellQuantity,Good good) {
+
+    public GoodCard(String name, int priceSupply, int priceSelling, int availableQuantity, int sellQuantity, Good good) {
         this.name = name;
         this.priceSupply = priceSupply;
         this.priceSelling = priceSelling;

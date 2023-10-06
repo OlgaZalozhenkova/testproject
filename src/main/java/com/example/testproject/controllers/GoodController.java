@@ -1,14 +1,8 @@
 package com.example.testproject.controllers;
 
 import com.example.testproject.dto.*;
-import com.example.testproject.models.Good;
-import com.example.testproject.models.GoodCard;
-import com.example.testproject.models.GoodOperation;
-import com.example.testproject.models.Supplier;
-import com.example.testproject.repositories.GoodCardRepository;
-import com.example.testproject.repositories.GoodOperationRepository;
-import com.example.testproject.repositories.GoodRepository;
-import com.example.testproject.repositories.SupplierRepository;
+import com.example.testproject.models.*;
+import com.example.testproject.repositories.*;
 import com.example.testproject.servicies.GoodService;
 import com.example.testproject.servicies.SupplierService;
 import org.modelmapper.ModelMapper;
@@ -17,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -29,9 +24,10 @@ public class GoodController {
     SupplierService supplierService;
     GoodOperationRepository goodOperationRepository;
     GoodCardRepository goodCardRepository;
+    RatingRepository1 ratingRepository1;
 
     @Autowired
-    public GoodController(GoodRepository goodRepository, SupplierRepository supplierRepository, ModelMapper modelMapper, GoodService goodService, SupplierService supplierService, GoodOperationRepository goodOperationRepository, GoodCardRepository goodCardRepository) {
+    public GoodController(GoodRepository goodRepository, SupplierRepository supplierRepository, ModelMapper modelMapper, GoodService goodService, SupplierService supplierService, GoodOperationRepository goodOperationRepository, GoodCardRepository goodCardRepository, RatingRepository1 ratingRepository1) {
         this.goodRepository = goodRepository;
         this.supplierRepository = supplierRepository;
         this.modelMapper = modelMapper;
@@ -39,10 +35,39 @@ public class GoodController {
         this.supplierService = supplierService;
         this.goodOperationRepository = goodOperationRepository;
         this.goodCardRepository = goodCardRepository;
+        this.ratingRepository1 = ratingRepository1;
+    }
+
+    @PostMapping("/set/rating")
+    public Rating setRating(@RequestParam("operationCurrent") String operationCurrent
+            , @RequestParam("supplierName") String supplierName,
+                            @RequestParam("item") String item,
+                            @RequestParam("value") double value) {
+        return goodService.setRating(operationCurrent, supplierName, item, value);
+    }
+
+    @GetMapping("/get/for/rating1")
+    public Optional<Rating> findByGoodAndSupplier(@RequestParam("goodName") String goodName,
+                                              @RequestParam("supplierName") String supplierName) {
+        return ratingRepository1.findByGoodAndSupplier(goodName, supplierName);
+    }
+
+
+    @GetMapping("/get/for/rating")
+    public Good getGoodForRating(@RequestParam("operationCurrent") String operationCurrent,
+                                 @RequestParam("supplierName") String supplierName,
+                                 @RequestParam("item") String item) {
+        return goodRepository.getGoodForRating(operationCurrent, supplierName, item);
+    }
+
+    @GetMapping("/good/card")
+    public List<GoodCard> findGoodCard(@RequestParam("supplierName") String supplierName,
+                                       @RequestParam("operationCurrent") String operationCurrent) {
+        return goodCardRepository.findGoodCard(supplierName, operationCurrent);
     }
 
     @GetMapping("/good/card/{name}")
-    public GoodCard findGoodCardByGoodId (@PathVariable("name") String name) {
+    public GoodCard findGoodCardByGoodId(@PathVariable("name") String name) {
         return goodCardRepository.findGoodCardByGoodId(name);
     }
 
@@ -88,9 +113,10 @@ public class GoodController {
 
     @PostMapping("/operation")
     public GoodDTOOperation1 createGoodDTOOperation1(@RequestParam("operation") String operation
-            ,@RequestBody List<GoodDTO1> goodsDTO1) {
-        return goodService.createGoodsDTOOperation1(goodsDTO1,operation);
+            , @RequestBody List<GoodDTO1> goodsDTO1) {
+        return goodService.createGoodsDTOOperation1(goodsDTO1, operation);
     }
+
     @GetMapping("/supplier")
     public Supplier findByName(@RequestParam("name") String name) {
         return supplierRepository.findByName(name);

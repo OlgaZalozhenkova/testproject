@@ -37,6 +37,10 @@ public class Supplier {
     @OneToMany(mappedBy = "supplier")
     private List<GoodOperation> goodOperations;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "supplier")
+    private List<Rating> ratings;
+
     public Supplier(String name) {
         this.name = name;
     }
