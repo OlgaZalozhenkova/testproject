@@ -31,6 +31,12 @@ public class Rating {
     @Column(name = "good_name")
     String goodName;
 
+    @Column(name = "is_changed")
+    boolean isChanged;
+
+    @Column(name = "is_deleted")
+    boolean isDeleted;
+
     @ManyToOne
     @JoinColumn(name = "good_id", referencedColumnName = "id")
     Good good;

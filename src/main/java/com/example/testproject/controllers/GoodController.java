@@ -38,17 +38,25 @@ public class GoodController {
         this.ratingRepository1 = ratingRepository1;
     }
 
-//    @PostMapping("/set/rating")
-//    public Rating setRating(@RequestParam("operationCurrent") String operationCurrent
-//            , @RequestParam("supplierName") String supplierName,
-//                            @RequestParam("item") String item,
-//                            @RequestParam("value") double value) {
-//        return goodService.setRating(operationCurrent, supplierName, item, value);
-//    }
+
+    @GetMapping("/op")
+    public List<GoodOperation> findByItem(@RequestParam("item") String item) {
+        return goodOperationRepository.findByItem(item);
+    }
 
     @PostMapping("/set/rating")
     public RatingDTOForCustomer setRating(@RequestBody RatingDTO ratingDTO) {
-        return goodService.setRating1(ratingDTO);
+        return goodService.setRating(ratingDTO);
+    }
+
+    @PostMapping("/change/rating")
+    public RatingDTOForCustomer changeRating(@RequestBody RatingDTO ratingDTO) {
+        return goodService.changeRating(ratingDTO);
+    }
+
+    @PostMapping("/delete/rating")
+    public RatingDTOForCustomer deleteRating(@RequestBody RatingDTO ratingDTO) {
+        return goodService.deleteRating(ratingDTO);
     }
 
     @GetMapping("/get/for/rating1")
@@ -144,7 +152,12 @@ public class GoodController {
 
     @PostMapping("/create/change/goodcard")
     public GoodCard createOrChangeGoodCard(@RequestBody GoodCard goodCard) {
-        return goodService.createOrChangeGoodCard1(goodCard);
+        return goodService.createOrChangeGoodCard(goodCard);
+    }
+
+    @PostMapping("/create/change/goodcard1")
+    public String createOrChangeGoodCard(@RequestBody GoodCardDTO goodCardDTO) {
+        return goodService.createOrChangeGoodCard1(goodCardDTO);
     }
 
     @GetMapping("/sell/good/quantity")
@@ -160,7 +173,7 @@ public class GoodController {
     }
 
     @GetMapping("/operation/item/date")
-    public List<GoodOperation> getGoodOperationsByItemAndDate(@RequestParam("item") String item, @RequestParam("date") Date date) {
+    public int getGoodOperationsByItemAndDate(@RequestParam("item") String item, @RequestParam("date") Date date) {
         return goodOperationRepository.getGoodOperationsByItemAndDate(item, date);
     }
 

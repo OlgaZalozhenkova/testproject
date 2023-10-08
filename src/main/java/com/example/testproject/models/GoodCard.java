@@ -25,10 +25,10 @@ public class GoodCard {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    private int id;
 
     @Column(name = "name")
-    String name;
+    private String name;
 
     @Column(name = "price_supply")
     int priceSupply;
@@ -37,16 +37,16 @@ public class GoodCard {
     int priceSelling;
 
     @Column(name = "available_quantity")
-    int availableQuantity;
+    private int availableQuantity;
 
     @Column(name = "sell_quantity")
-    int sellQuantity;
+    private int sellQuantity;
 
     @Column(name ="rating")
-    double rating;
+    private double rating;
 
     @Column(name = "count_value")
-    double countValue;
+    private double countValue;
 
 //    @JsonIgnore
 //    @OneToOne
@@ -57,21 +57,13 @@ public class GoodCard {
     @OneToOne(mappedBy = "goodCard")
     Good good;
 
-    public GoodCard(int id, String name, int priceSupply, int priceSelling, int availableQuantity, int sellQuantity) {
-        this.id = id;
+    public GoodCard(String name, int priceSupply, int priceSelling, int availableQuantity, int sellQuantity, double rating, double countValue) {
         this.name = name;
         this.priceSupply = priceSupply;
         this.priceSelling = priceSelling;
         this.availableQuantity = availableQuantity;
         this.sellQuantity = sellQuantity;
-    }
-
-    public GoodCard(String name, int priceSupply, int priceSelling, int availableQuantity, int sellQuantity, Good good) {
-        this.name = name;
-        this.priceSupply = priceSupply;
-        this.priceSelling = priceSelling;
-        this.availableQuantity = availableQuantity;
-        this.sellQuantity = sellQuantity;
-        this.good = good;
+        this.rating = rating;
+        this.countValue = countValue;
     }
 }

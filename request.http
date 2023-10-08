@@ -1,3 +1,7 @@
+GET http://localhost:1137/good/op?item=good2
+Accept: application/json
+
+###
 GET http://localhost:1122/good/get/for/rating1?goodName=good3&supplierName=supplier3
 Accept: application/json
 
@@ -43,7 +47,7 @@ GET http://localhost:1088/good/supplier/name?name=good1
 Accept: application/json
 
 ###
-GET http://localhost:1087/good/operation/item/date?item=good1&date=2023/10/02
+GET http://localhost:1140/good/operation/item/date?item=good2&date=2023/10/08
 Accept: application/json
 
 ###
@@ -55,7 +59,7 @@ GET http://localhost:1082/good/operation/supplier/date
 Accept: application/json
 
 ###
-GET http://localhost:1086/good/operation/supplier/date?operationCurrent=supply&supplierName=supplier2&dateFrom=2023/01/01&dateTo=2023/10/30
+GET http://localhost:1137/good/operation/supplier/date?operationCurrent=supply&supplierName=supplier1&dateFrom=2023/10/08&dateTo=2023/10/08
 Accept: application/json
 
 ###

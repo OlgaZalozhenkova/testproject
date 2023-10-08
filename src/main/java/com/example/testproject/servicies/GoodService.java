@@ -152,10 +152,27 @@ public class GoodService {
     }
 
     @Transactional
-    public GoodCard createOrChangeGoodCard1(GoodCard goodCard) {
+    public GoodCard createOrChangeGoodCard(GoodCard goodCard) {
         GoodCard goodCardDB = goodCardRepository.findByName(goodCard.getName());
         if (goodCardDB == null) {
             return goodCardRepository.save(goodCard);
+        } else return null;
+    }
+
+    @Transactional
+    public String createOrChangeGoodCard1(GoodCardDTO goodCardDTO) {
+        GoodCard goodCardDB = goodCardRepository.findByName(goodCardDTO.getName());
+        if (goodCardDB == null) {
+            GoodCard goodCard = modelMapper.map(goodCardDTO, GoodCard.class);
+            goodCard.setPriceSupply(goodCardDTO.getValueForSupply());
+            goodCard.setPriceSelling(goodCardDTO.getValueForSelling());
+            goodCard.setAvailableQuantity(0);
+            goodCard.setSellQuantity(0);
+            goodCard.setRating(0);
+            goodCard.setCountValue(0);
+            goodCard.setGood(null);
+            goodCardRepository.save(goodCard);
+            return "You have created " + goodCard.getName() + " goodcard";
         } else return null;
     }
 
@@ -227,47 +244,8 @@ public class GoodService {
         }
     }
 
-    //    @Transactional
-//    // установить ограничения по рейтингу диапазон оценок
-//    //поля не должны быть пустыми
-//    // метод только для купленных товаров, оценивать не купленные товары не нужно
-//    public Rating setRating(String operationCurrent, String supplierName, String item, double value) {
-//
-////        Rating ratingDB = ratingRepository1.
-////                findByGoodAndSupplier(supplierName, item).orElse(null);
-//        Good good = goodRepository.findByName(item);
-//        Supplier supplier = supplierRepository.findByName(supplierName);
-//        Rating ratingDB = ratingRepository1.findBySupplierAndGood(supplier,good);
-//        if (ratingDB == null) {
-//            Supplier supplierDB = supplierRepository.findByName(supplierName);
-//            // товар именно купленный этим контрагентом
-//            Good goodForSetRating = goodRepository
-//                    .getGoodForRating(operationCurrent, supplierName, item);
-//
-//            if (supplierDB == null || !operationCurrent.equals("selling")
-//                    || goodForSetRating == null) {
-//                return null; // исключение
-//            }
-//
-//            Rating ratingNew = new Rating(value, item, goodForSetRating, supplierDB);
-//            ratingRepository1.save(ratingNew);
-//            GoodCard goodCard = goodCardRepository.findByName(item);
-//
-//            double rating = goodCard.getRating();
-//            double countValue = goodCard.getCountValue();
-//
-//            double countValueNew = countValue+1;
-//            double ratingNewGoodCard = (rating+value)/countValueNew;
-//
-//            goodCard.setRating(ratingNewGoodCard);
-//            goodCard.setCountValue(countValueNew);
-//            goodCardRepository.save(goodCard);
-//            return ratingNew;
-//        }
-//        else return null;
-//    }
     @Transactional
-    public RatingDTOForCustomer setRating1(RatingDTO ratingDTO) {
+    public RatingDTOForCustomer setRating(RatingDTO ratingDTO) {
 
         String sellerName = ratingDTO.getSellerName();
         String goodName = ratingDTO.getGoodName();
@@ -287,6 +265,7 @@ public class GoodService {
             Rating rating = modelMapper.map(ratingDTO, Rating.class);
             rating.setGood(goodForSetRating);
             rating.setSupplier(supplier);
+            rating.setChanged(false);
 
             ratingRepository1.save(rating);
             GoodCard goodCard = goodCardRepository.findByName(goodName);
@@ -308,6 +287,63 @@ public class GoodService {
             ratingDTOForCustomer.setMessage("Your evaluation is " + value);
             return ratingDTOForCustomer;
         } else return null;
+    }
+
+    @Transactional
+    public RatingDTOForCustomer changeRating(RatingDTO ratingDTO) {
+
+        String sellerName = ratingDTO.getSellerName();
+        String goodName = ratingDTO.getGoodName();
+        double valueDTO = ratingDTO.getValue();
+
+        Supplier supplier = supplierRepository.findByName(sellerName);
+        Good good = goodRepository.findByName(goodName);
+        Rating ratingExistDB = ratingRepository1.findBySupplierAndGood(supplier, good);
+
+        if (ratingExistDB == null || ratingExistDB.isChanged() || ratingExistDB.isDeleted()) {
+            return null; //исключение
+        } else {
+            double valueDB = ratingExistDB.getValue();
+            ratingExistDB.setValue(valueDTO);
+            ratingExistDB.setChanged(true);
+            GoodCard goodCard = goodCardRepository.findByName(goodName);
+            double currentRating = goodCard.getRating();
+            double countValue = goodCard.getCountValue();
+            double ratingNew = (currentRating * countValue - valueDB + valueDTO) / countValue;
+            goodCard.setRating(ratingNew);
+
+            RatingDTOForCustomer ratingDTOForCustomer = new RatingDTOForCustomer(valueDTO,
+                    "Your have changed evaluation to " + valueDTO);
+            return ratingDTOForCustomer;
+        }
+    }
+
+    @Transactional
+    public RatingDTOForCustomer deleteRating(RatingDTO ratingDTO) {
+
+        String sellerName = ratingDTO.getSellerName();
+        String goodName = ratingDTO.getGoodName();
+
+        Supplier supplier = supplierRepository.findByName(sellerName);
+        Good good = goodRepository.findByName(goodName);
+        Rating ratingExistDB = ratingRepository1.findBySupplierAndGood(supplier, good);
+
+        if (ratingExistDB == null || ratingExistDB.isDeleted()) {
+            return null; //исключение
+        } else {
+            double valueDB = ratingExistDB.getValue();
+            ratingExistDB.setDeleted(true);
+            GoodCard goodCard = goodCardRepository.findByName(goodName);
+            double currentRating = goodCard.getRating();
+            double countValue = goodCard.getCountValue();
+            double ratingNew = (currentRating * countValue - valueDB) / (countValue - 1);
+            goodCard.setRating(ratingNew);
+            goodCard.setCountValue(countValue - 1);
+
+            RatingDTOForCustomer ratingDTOForCustomer = new RatingDTOForCustomer(valueDB,
+                    "Your have removed your evaluation " + valueDB);
+            return ratingDTOForCustomer;
+        }
     }
 
     @Transactional
