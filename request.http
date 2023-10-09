@@ -47,7 +47,7 @@ GET http://localhost:1088/good/supplier/name?name=good1
 Accept: application/json
 
 ###
-GET http://localhost:1140/good/operation/item/date?item=good2&date=2023/10/08
+GET http://localhost:1142/good/available/quantity?item=good1&date=2023/06/08
 Accept: application/json
 
 ###

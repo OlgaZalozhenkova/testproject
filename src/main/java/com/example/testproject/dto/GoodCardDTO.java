@@ -12,7 +12,7 @@ import lombok.Setter;
 public class GoodCardDTO {
 
     String name;
-    int ValueForSupply;
+    int valueForSupply;
     int ValueForSelling;
 
 }

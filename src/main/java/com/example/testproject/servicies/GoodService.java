@@ -162,18 +162,31 @@ public class GoodService {
     @Transactional
     public String createOrChangeGoodCard1(GoodCardDTO goodCardDTO) {
         GoodCard goodCardDB = goodCardRepository.findByName(goodCardDTO.getName());
+
+        int valueForSupplyNew =goodCardDTO.getValueForSupply();
+        int valueForSellingNew =goodCardDTO.getValueForSelling();
+
         if (goodCardDB == null) {
             GoodCard goodCard = modelMapper.map(goodCardDTO, GoodCard.class);
-            goodCard.setPriceSupply(goodCardDTO.getValueForSupply());
-            goodCard.setPriceSelling(goodCardDTO.getValueForSelling());
+            goodCard.setPriceSupply(valueForSupplyNew);
+            goodCard.setPriceSelling(valueForSellingNew);
             goodCard.setAvailableQuantity(0);
             goodCard.setSellQuantity(0);
             goodCard.setRating(0);
             goodCard.setCountValue(0);
             goodCard.setGood(null);
             goodCardRepository.save(goodCard);
-            return "You have created " + goodCard.getName() + " goodcard";
-        } else return null;
+            return "You have created " + goodCard.getName() + " goodcard. " +
+                    "Supply  price is: " + valueForSupplyNew +
+                    " and selling price is: " + valueForSellingNew +".";
+        } else {
+            goodCardDB.setPriceSupply(valueForSupplyNew);
+            goodCardDB.setPriceSelling(valueForSellingNew);
+            goodCardRepository.save(goodCardDB);
+            return "You have changed " + goodCardDB.getName() + " goodcard. " +
+                    "Supply  price is: " + valueForSupplyNew +
+                    " and selling price is: " + valueForSellingNew +".";
+        }
     }
 
     @Transactional
@@ -346,13 +359,21 @@ public class GoodService {
         }
     }
 
-    @Transactional
-    public List<Good> createGoods(List<Good> goods) {
-        List<Good> savedGoods = new ArrayList<>();
-        for (Good good : goods
-        ) {
-            savedGoods.add(createGood(good));
-        }
-        return savedGoods;
+    public String getGoodsAvailableQuantityByDate(String item, Date date) {
+
+        int availableQuantity = goodOperationRepository
+                .getGoodOperationsByItemAndDate(item, date);
+
+        return "Available quantity of " + item + " is " + availableQuantity;
     }
+
+//    @Transactional
+//    public List<Good> createGoods(List<Good> goods) {
+//        List<Good> savedGoods = new ArrayList<>();
+//        for (Good good : goods
+//        ) {
+//            savedGoods.add(createGood(good));
+//        }
+//        return savedGoods;
+//    }
 }

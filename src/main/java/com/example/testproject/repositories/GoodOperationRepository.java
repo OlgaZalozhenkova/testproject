@@ -14,9 +14,6 @@ public interface GoodOperationRepository extends JpaRepository<GoodOperation, In
     @Query("select g from GoodOperation g where g.supplierName = :supplierName")
     List<GoodOperation> getGoodOperationsBySupplierName(String supplierName);
 
-    @Query("select g from GoodOperation g where g.operationCurrent = :supply and g.item = :item")
-    List<GoodOperation> getSellQuantity(String supply, String item);
-
     @Query("select g from GoodOperation g where g.date >= :dateFrom and g.date <= :dateTo")
     List<GoodOperation> getGoodOperationsByDate(Date dateFrom, Date dateTo);
 
@@ -28,8 +25,11 @@ public interface GoodOperationRepository extends JpaRepository<GoodOperation, In
     List<GoodOperation> getOperationsByOperationAndSupplierNameAndDate(String operationCurrent, String supplierName, Date dateFrom, Date dateTo);
 
     @Query(value = "select good_operations.quantity_db from good_operations\n" +
-            "where item = :item and Date(date) = :date order by date desc limit 1", nativeQuery = true)
+            "where item = :item and Date(date)<= :date order by date desc limit 1", nativeQuery = true)
     int getGoodOperationsByItemAndDate(String item, Date date);
 
-    List<GoodOperation> findByItem(String item);
+//    List<GoodOperation> findByItem(String item);
+
+//    @Query("select g from GoodOperation g where g.operationCurrent = :supply and g.item = :item")
+//    List<GoodOperation> getSellQuantity(String supply, String item);
 }

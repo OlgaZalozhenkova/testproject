@@ -38,146 +38,88 @@ public class GoodController {
         this.ratingRepository1 = ratingRepository1;
     }
 
-
-    @GetMapping("/op")
-    public List<GoodOperation> findByItem(@RequestParam("item") String item) {
-        return goodOperationRepository.findByItem(item);
+    // создать или изменить карточку товара
+    @PostMapping("/create/change/goodcard")
+    public String createOrChangeGoodCard(@RequestBody GoodCardDTO goodCardDTO) {
+        return goodService.createOrChangeGoodCard1(goodCardDTO);
     }
 
-    @PostMapping("/set/rating")
-    public RatingDTOForCustomer setRating(@RequestBody RatingDTO ratingDTO) {
-        return goodService.setRating(ratingDTO);
-    }
-
-    @PostMapping("/change/rating")
-    public RatingDTOForCustomer changeRating(@RequestBody RatingDTO ratingDTO) {
-        return goodService.changeRating(ratingDTO);
-    }
-
-    @PostMapping("/delete/rating")
-    public RatingDTOForCustomer deleteRating(@RequestBody RatingDTO ratingDTO) {
-        return goodService.deleteRating(ratingDTO);
-    }
-
-    @GetMapping("/get/for/rating1")
-    public Optional<Rating> findByGoodAndSupplier(@RequestParam("goodName") String goodName,
-                                              @RequestParam("supplierName") String supplierName) {
-        return ratingRepository1.findByGoodAndSupplier(goodName, supplierName);
-    }
-
-
-    @GetMapping("/get/for/rating")
-    public Good getGoodForRating(@RequestParam("operationCurrent") String operationCurrent,
-                                 @RequestParam("supplierName") String supplierName,
-                                 @RequestParam("item") String item) {
-        return goodRepository.getGoodForRating(operationCurrent, supplierName, item);
-    }
-
-    @GetMapping("/good/card")
-    public List<GoodCard> findGoodCard(@RequestParam("supplierName") String supplierName,
-                                       @RequestParam("operationCurrent") String operationCurrent) {
-        return goodCardRepository.findGoodCard(supplierName, operationCurrent);
-    }
-
+    // карточка товара по наименованию товара
     @GetMapping("/good/card/{name}")
     public GoodCard findGoodCardByGoodId(@PathVariable("name") String name) {
         return goodCardRepository.findGoodCardByGoodId(name);
     }
 
-    @GetMapping("/all")
-    public List<Good> findAll() {
-        return goodRepository.findAll();
-    }
-
-    @GetMapping("/all/operations")
-    public List<GoodOperation> findAllOperations() {
-        return goodOperationRepository.findAll();
-    }
-
-    @GetMapping("/item/{id}")
-    public Good findGood(@PathVariable("id") int id) {
-        return goodRepository.getGoodByIdQuery(id);
-    }
-
-    @GetMapping("/item")
-    public Good findGood(@RequestParam("name") String name) {
-        return goodRepository.findByName(name);
-    }
-
-    @GetMapping("/supplier/{id}")
-    public Supplier findSupplier(@PathVariable("id") int id) {
-        return supplierRepository.getSupplierByIdQuery(id);
-    }
-
-    @GetMapping("/supplier/name")
-    public List<Supplier> findSupplier(@RequestParam("name") String name) {
-        return supplierRepository.getSuppliers(name);
-    }
-
-    @PostMapping("/create/good")
-    public Good createGood(@RequestBody Good good) {
-        return goodService.createGood(good);
-    }
-
-    @PostMapping("/sell/good")
-    public Good sellGood(@RequestBody Good good) {
-        return goodService.sellGood(good);
-    }
-
+    // купить или продать товар
     @PostMapping("/operation")
     public GoodDTOOperation1 createGoodDTOOperation1(@RequestParam("operation") String operation
             , @RequestBody List<GoodDTO1> goodsDTO1) {
         return goodService.createGoodsDTOOperation1(goodsDTO1, operation);
     }
 
-    @GetMapping("/supplier")
-    public Supplier findByName(@RequestParam("name") String name) {
-        return supplierRepository.findByName(name);
+    // доступное количество товара на складе на определенную дату
+    @GetMapping("/available/quantity")
+    String getGoodsAvailableQuantityByDate(@RequestParam("item") String item
+            , @RequestParam("date") Date date) {
+        return goodService.getGoodsAvailableQuantityByDate(item, date);
     }
 
-    @GetMapping("/query/{id}")
-    public List<Good> query(@PathVariable("id") int id) {
-        return goodRepository.getGoodsBySupplierId(id);
+    // Рейтинги
+    // поставить оценку можно только один раз
+    @PostMapping("/set/rating")
+    public RatingDTOForCustomer setRating(@RequestBody RatingDTO ratingDTO) {
+        return goodService.setRating(ratingDTO);
     }
 
-    @GetMapping("/query/name")
-    public List<Good> query(@RequestParam("name") String name) {
-        return goodRepository.getGoodsBySupplierName(name);
+    // изменить оценку можно только один раз
+    @PostMapping("/change/rating")
+    public RatingDTOForCustomer changeRating(@RequestBody RatingDTO ratingDTO) {
+        return goodService.changeRating(ratingDTO);
     }
 
-    @GetMapping("/operations")
+    // удалить оценку можно только один раз
+    @PostMapping("/delete/rating")
+    public RatingDTOForCustomer deleteRating(@RequestBody RatingDTO ratingDTO) {
+        return goodService.deleteRating(ratingDTO);
+    }
+
+    // аналитика по рейтингам
+    // рейтинг из журнала рейтингов по наименованию товара и наименованию покупателя
+    @GetMapping("/get/for/rating1")
+    public Optional<Rating> findByGoodAndSupplier(@RequestParam("goodName") String goodName,
+                                                  @RequestParam("supplierName") String supplierName) {
+        return ratingRepository1.findByGoodAndSupplier(goodName, supplierName);
+    }
+
+    // аналитика по журналу операций
+    // все операции
+    @GetMapping("/operations/all")
+    public List<GoodOperation> findAllOperations() {
+        return goodOperationRepository.findAll();
+    }
+
+    // журнал операций купли/продажи по наименованию контрагента
+    @GetMapping("/operations/counterpartname")
     public List<GoodOperation> getGoodOperationsBySupplierName(@RequestParam("supplierName") String supplierName) {
         return goodOperationRepository.getGoodOperationsBySupplierName(supplierName);
     }
 
-    @PostMapping("/create/change/goodcard")
-    public GoodCard createOrChangeGoodCard(@RequestBody GoodCard goodCard) {
-        return goodService.createOrChangeGoodCard(goodCard);
-    }
-
-    @PostMapping("/create/change/goodcard1")
-    public String createOrChangeGoodCard(@RequestBody GoodCardDTO goodCardDTO) {
-        return goodService.createOrChangeGoodCard1(goodCardDTO);
-    }
-
-    @GetMapping("/sell/good/quantity")
-    public List<GoodOperation> getSellQuantity(@RequestParam("supply") String supply
-            , @RequestParam("item") String item) {
-        return goodOperationRepository
-                .getSellQuantity(supply, item);
-    }
-
-    @GetMapping("/operation/supplier")
-    public List<GoodOperation> getGoodOperationsByOperationAndSupplierName(@RequestParam("operationCurrent") String operationCurrent, @RequestParam("supplierName") String supplierName) {
+    // журнал операций купли/продажи по наименованию операции и наименованию контрагента
+    @GetMapping("/operations/operationname/counterpartname")
+    public List<GoodOperation> getGoodOperationsByOperationAndSupplierName(
+            @RequestParam("operationCurrent") String operationCurrent,
+            @RequestParam("supplierName") String supplierName) {
         return goodOperationRepository.getGoodOperationsByOperationAndSupplierName(operationCurrent, supplierName);
     }
 
-    @GetMapping("/operation/item/date")
-    public int getGoodOperationsByItemAndDate(@RequestParam("item") String item, @RequestParam("date") Date date) {
-        return goodOperationRepository.getGoodOperationsByItemAndDate(item, date);
+    // журнал операций купли/продажи за указанный период
+    @GetMapping("/operations/date")
+    public List<GoodOperation> getGoodOperationsByOperationCurrent(@RequestParam("dateFrom") Date dateFrom, @RequestParam("dateTo") Date dateTo) {
+        return goodOperationRepository.getGoodOperationsByDate(dateFrom, dateTo);
     }
 
-    @GetMapping("/operation/supplier/date")
+    // журнал операций купли/продажи по наименованию операции и наименованию контрагента за указанный период
+    @GetMapping("/operations/counterpart/date")
     public List<GoodOperation> geOperationsByOperationAndSupplierNameAndDate(
             @RequestParam("operationCurrent") String operationCurrent,
             @RequestParam("supplierName") String supplierName,
@@ -186,46 +128,33 @@ public class GoodController {
                 supplierName, dateFrom, dateTo);
     }
 
-    @GetMapping("/operation/date")
-    public List<GoodOperation> getGoodOperationsByOperationCurrent(@RequestParam("dateFrom") Date dateFrom, @RequestParam("dateTo") Date dateTo) {
-        return goodOperationRepository.getGoodOperationsByDate(dateFrom, dateTo);
+    // аналитика по товарам
+    // все товары
+    @GetMapping("/all")
+    public List<Good> findAll() {
+        return goodRepository.findAll();
     }
 
-    @PostMapping("/create/goods")
-    public List<Good> createGoods(@RequestBody List<Good> goods) {
-        return goodService.createGoods(goods);
+    // аналитика по контрагентам
+    // список контрагентов по наименованию товара
+    @GetMapping("/counterparts/goodname")
+    public List<Supplier> findCounterpartsByGoodName(@RequestParam("name") String name) {
+        return supplierRepository.findCounterpartsByGoodName(name);
     }
+
+//    @PostMapping("/create/good")
+//    public Good createGood(@RequestBody Good good) {
+//        return goodService.createGood(good);
+//    }
 //
-//    @PostMapping("/sell/goods")
-//    public List<Good> sellGoods(@RequestBody List<Good> goods) {
-//        return goodService.sellGoods(goods);
+//    @PostMapping("/sell/good")
+//    public Good sellGood(@RequestBody Good good) {
+//        return goodService.sellGood(good);
 //    }
 
-    //    @PostMapping("/create/goodDTOCustomer")
-//    public GoodDTOCustomer createGoodDTOCustomer(@RequestBody GoodDTO goodDTO) {
-//        return goodService.createGoodDTOCustomer(goodDTO);
+//    @PostMapping("/create/change/goodcard")
+//    public GoodCard createOrChangeGoodCard(@RequestBody GoodCard goodCard) {
+//        return goodService.createOrChangeGoodCard(goodCard);
 //    }
 
-//    @PostMapping("/sell/goodsDTO")
-//    public List<Good> sellGoodsDTO(@RequestBody List<GoodDTO> goodsDTO) {
-//        return goodService.sellGoodsDTO(goodsDTO);
-//    }
-
-    //    @PostMapping("/create/goodsDTOOperation")
-//    public GoodDTOOperation createGoodDTOOperation(@RequestBody List<GoodDTO> goodsDTO) {
-//        return goodService.createGoodsDTOOperation(goodsDTO);
-//    }
-
-//    @PostMapping("/create/goodsDTOCustomer")
-//    public List<GoodDTOCustomer> createGoodDTO(@RequestBody List<GoodDTO> goodsDTO) {
-//        return goodService.createGoodsDTOCustomer(goodsDTO);
-//    }
-
-    //    @GetMapping("/sell/good/quantity")
-//    public List<GoodOperation> getGoodOperationsByOperationCurrent
-//            (@RequestParam("operationcurrent") String operationCurrent
-//            , @RequestParam("goodname") String supplierName) {
-//        return goodOperationRepository
-//                .getSellQuantity(operationCurrent,supplierName);
-//    }
 }

@@ -13,13 +13,14 @@ import java.util.Optional;
 @Repository
 public interface RatingRepository1 extends JpaRepository<Rating, Integer> {
 
-    List<Rating> findByGoodName(String goodName);
-
     Rating findBySupplierAndGood(Supplier supplier, Good good);
+
+    @Query("select r from Rating r join r.supplier supplier where r.goodName =:goodName and supplier.name =:supplierName")
+    Optional<Rating> findByGoodAndSupplier(String goodName, String supplierName);
 
 //    @Query("select r from Rating r join r.suppliers supplier where r.goodName =:goodName and supplier.name =:supplierName")
 //    Rating findByGoodAndSupplier1(String goodName, String supplierName);
 
-    @Query("select r from Rating r join r.supplier supplier where r.goodName =:goodName and supplier.name =:supplierName")
-    Optional<Rating> findByGoodAndSupplier(String goodName, String supplierName);
+//List<Rating> findByGoodName(String goodName);
+
 }

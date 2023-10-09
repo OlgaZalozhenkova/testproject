@@ -10,24 +10,27 @@ import java.util.List;
 
 @Repository
 public interface GoodRepository extends JpaRepository<Good,Integer> {
-    @Query("select g from Good g where g.id = :id")
-    Good getGoodByIdQuery(int id);
-
-    @Query("select g from Good g join g.suppliers supplier where supplier.id = :id")
-    List<Good> getGoodsBySupplierId(int id);
-
-    @Query("select g from Good g join g.suppliers supplier where supplier.name = :name")
-    List<Good> getGoodsBySupplierName(String name);
 
     @Query("select g from Good g join g.goodOperations goodOperation " +
             "where goodOperation.operationCurrent = :operationCurrent and " +
             "goodOperation.supplierName = :supplierName and goodOperation.item= :item")
     Good getGoodForRating(String operationCurrent, String supplierName,String item);
 
+    Good findByName(String name);
+
+//    @Query("select g from Good g where g.id = :id")
+//    Good getGoodByIdQuery(int id);
+//
+//    @Query("select g from Good g join g.suppliers supplier where supplier.id = :id")
+//    List<Good> getGoodsBySupplierId(int id);
+//
+//    @Query("select g from Good g join g.suppliers supplier where supplier.name = :name")
+//    List<Good> getGoodsBySupplierName(String name);
+
 //    @Query("select g from Good g join g.goodOperations goodOperation where goodOperation.item = :item")
 //    Good getGoodNameAndDate(String item, Date date);
 
-    Good findByName(String name);
+
 
 
 }
