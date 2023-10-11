@@ -64,4 +64,13 @@ public class GoodCard {
         this.rating = rating;
         this.countValue = countValue;
     }
+
+    @Override
+    public String toString() {
+        return "GoodCard{" +
+                "name='" + name + '\'' +
+                ", priceSupply=" + priceSupply +
+                ", priceSelling=" + priceSelling +
+                '}';
+    }
 }

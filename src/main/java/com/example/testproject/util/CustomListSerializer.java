@@ -1,6 +1,6 @@
 package com.example.testproject.util;
 
-import com.example.testproject.models.Supplier;
+import com.example.testproject.models.Counterpart;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -10,25 +10,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomListSerializer extends StdSerializer<List<Supplier>> {
+public class CustomListSerializer extends StdSerializer<List<Counterpart>> {
     public CustomListSerializer() {
         this(null);
     }
 
-    public CustomListSerializer(Class<List<Supplier>> t) {
+    public CustomListSerializer(Class<List<Counterpart>> t) {
         super(t);
     }
 
     @Override
     public void serialize(
-            List<Supplier> suppliers,
+            List<Counterpart> counterparts,
             JsonGenerator generator,
             SerializerProvider provider)
             throws IOException, JsonProcessingException {
 
         List<Integer> ids = new ArrayList<>();
-        for (Supplier supplier : suppliers) {
-            ids.add(supplier.getId());
+        for (Counterpart counterpart : counterparts) {
+            ids.add(counterpart.getId());
         }
         generator.writeObject(ids);
     }

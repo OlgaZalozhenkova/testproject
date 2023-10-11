@@ -8,8 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Entity
 @Table(name = "rating")
 @Getter
@@ -43,13 +41,13 @@ public class Rating {
 
     @ManyToOne
     @JoinColumn(name = "supplier_id", referencedColumnName = "id")
-    private Supplier supplier;
+    private Counterpart counterpart;
 
-    public Rating(double value, String goodName, Good good, Supplier supplier) {
+    public Rating(double value, String goodName, Good good, Counterpart counterpart) {
         this.value = value;
         this.goodName = goodName;
         this.good = good;
-        this.supplier = supplier;
+        this.counterpart = counterpart;
     }
 
     //    @ManyToMany

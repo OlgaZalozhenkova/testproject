@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -17,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "good")
+@Builder
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id")
@@ -41,7 +39,7 @@ public class Good {
     @JoinTable(name = "good_supplier",
             joinColumns = @JoinColumn(name = "good_id"),
             inverseJoinColumns = @JoinColumn(name = "supplier_id"))
-    private List<Supplier> suppliers;
+    private List<Counterpart> counterparts;
 
     @JsonIgnore
     @OneToMany(mappedBy = "good")
@@ -60,4 +58,9 @@ public class Good {
     @OneToMany(mappedBy = "good")
     List<Rating> ratings;
 
+    public Good(String name, int price, int quantity) {
+        this.name = name;
+        this.price = price;
+        this.quantity = quantity;
+    }
 }

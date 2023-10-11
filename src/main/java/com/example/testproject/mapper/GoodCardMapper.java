@@ -1,8 +1,10 @@
-package com.example.testproject;
+package com.example.testproject.mapper;
 
 import com.example.testproject.dto.GoodCardDTO;
 import com.example.testproject.models.GoodCard;
+import org.springframework.stereotype.Component;
 
+@Component
 public class GoodCardMapper {
 
     public GoodCard map(GoodCardDTO dto) {

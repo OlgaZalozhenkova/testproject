@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GoodDTOOperation1 {
-    private List<GoodDTO1> items;
+public class GoodOperationDTO {
+    private List<GoodDTO> items;
     private int totalSum;
 }

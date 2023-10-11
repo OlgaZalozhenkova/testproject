@@ -43,7 +43,7 @@ GET http://localhost:1090/good/sell/good/quantity?supply=supply&item=good1
 Accept: application/json
 
 ###
-GET http://localhost:1088/good/supplier/name?name=good1
+GET http://localhost:1088/good/counterpart/name?name=good1
 Accept: application/json
 
 ###
@@ -55,15 +55,15 @@ GET http://localhost:1087/good/query/name?name=supplier2
 Accept: application/json
 
 ###
-GET http://localhost:1082/good/operation/supplier/date
+GET http://localhost:1082/good/operation/counterpart/date
 Accept: application/json
 
 ###
-GET http://localhost:1137/good/operation/supplier/date?operationCurrent=supply&supplierName=supplier1&dateFrom=2023/10/08&dateTo=2023/10/08
+GET http://localhost:1137/good/operation/counterpart/date?operationCurrent=supply&supplierName=supplier1&dateFrom=2023/10/08&dateTo=2023/10/08
 Accept: application/json
 
 ###
-GET http://localhost:1081/good/operation/supplier?operationCurrent=supply&supplierName=supplier3
+GET http://localhost:1081/good/operation/counterpart?operationCurrent=supply&supplierName=supplier3
 Accept: application/json
 
 ###
@@ -71,7 +71,7 @@ GET http://localhost:1081/good/operation/current?operationCurrent=supply
 Accept: application/json
 
 ###
-GET http://localhost:1080/good/supplier?name=supplier3
+GET http://localhost:1080/good/counterpart?name=supplier3
 Accept: application/json
 
 ###

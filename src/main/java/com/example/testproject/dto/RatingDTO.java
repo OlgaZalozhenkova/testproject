@@ -12,5 +12,5 @@ import lombok.Setter;
 public class RatingDTO {
     private double value;
     private String goodName;
-    private String sellerName;
+    private String customerName;
 }

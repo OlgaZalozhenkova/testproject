@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
@@ -16,6 +13,7 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Table(name = "good_operations")
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
@@ -39,7 +37,7 @@ public class GoodOperation {
     int quantity;
 
     @Column(name = "supplier_name")
-    String supplierName;
+    String counterpartName;
 
     @Column(name = "date")
     Date date;
@@ -58,18 +56,18 @@ public class GoodOperation {
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "supplier_id", referencedColumnName = "id")
-    private Supplier supplier;
+    private Counterpart counterpart;
 
-    public GoodOperation(String item, String operationCurrent, int price, int quantity, String supplierName, Good good, Supplier supplier, Date date, int priceDB, int quantityDB) {
+    public GoodOperation(String item, String operationCurrent, int price, int quantity, String counterpartName, Date date, int priceDB, int quantityDB, Good good, Counterpart counterpart) {
         this.item = item;
         this.operationCurrent = operationCurrent;
         this.price = price;
         this.quantity = quantity;
-        this.supplierName = supplierName;
-        this.good = good;
-        this.supplier = supplier;
+        this.counterpartName = counterpartName;
         this.date = date;
         this.priceDB = priceDB;
         this.quantityDB = quantityDB;
+        this.good = good;
+        this.counterpart = counterpart;
     }
 }

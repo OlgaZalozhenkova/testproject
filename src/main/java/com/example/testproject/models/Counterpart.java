@@ -19,7 +19,7 @@ import java.util.List;
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id")
 
-public class Supplier {
+public class Counterpart {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,19 +29,19 @@ public class Supplier {
     private String name;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "suppliers")
+    @ManyToMany(mappedBy = "counterparts")
     @JsonManagedReference
     private List<Good> goods;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "supplier")
+    @OneToMany(mappedBy = "counterpart")
     private List<GoodOperation> goodOperations;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "supplier")
+    @OneToMany(mappedBy = "counterpart")
     private List<Rating> ratings;
 
-    public Supplier(String name) {
+    public Counterpart(String name) {
         this.name = name;
     }
 }

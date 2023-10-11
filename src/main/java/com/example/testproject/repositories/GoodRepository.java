@@ -13,8 +13,8 @@ public interface GoodRepository extends JpaRepository<Good,Integer> {
 
     @Query("select g from Good g join g.goodOperations goodOperation " +
             "where goodOperation.operationCurrent = :operationCurrent and " +
-            "goodOperation.supplierName = :supplierName and goodOperation.item= :item")
-    Good getGoodForRating(String operationCurrent, String supplierName,String item);
+            "goodOperation.counterpartName = :counterpartName and goodOperation.item= :item")
+    Good getGoodForRating(String operationCurrent, String counterpartName,String item);
 
     Good findByName(String name);
 

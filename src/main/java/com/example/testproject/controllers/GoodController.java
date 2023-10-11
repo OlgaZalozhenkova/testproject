@@ -4,7 +4,7 @@ import com.example.testproject.dto.*;
 import com.example.testproject.models.*;
 import com.example.testproject.repositories.*;
 import com.example.testproject.servicies.GoodService;
-import com.example.testproject.servicies.SupplierService;
+import com.example.testproject.servicies.CounterpartService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,43 +18,49 @@ import java.util.Optional;
 @RequestMapping("/good")
 public class GoodController {
     GoodRepository goodRepository;
-    SupplierRepository supplierRepository;
+    CounterpartRepository counterpartRepository;
     ModelMapper modelMapper;
     GoodService goodService;
-    SupplierService supplierService;
+    CounterpartService counterpartService;
     GoodOperationRepository goodOperationRepository;
     GoodCardRepository goodCardRepository;
-    RatingRepository1 ratingRepository1;
+    RatingRepository ratingRepository;
 
     @Autowired
-    public GoodController(GoodRepository goodRepository, SupplierRepository supplierRepository, ModelMapper modelMapper, GoodService goodService, SupplierService supplierService, GoodOperationRepository goodOperationRepository, GoodCardRepository goodCardRepository, RatingRepository1 ratingRepository1) {
+    public GoodController(GoodRepository goodRepository, CounterpartRepository counterpartRepository, ModelMapper modelMapper, GoodService goodService, CounterpartService counterpartService, GoodOperationRepository goodOperationRepository, GoodCardRepository goodCardRepository, RatingRepository ratingRepository) {
         this.goodRepository = goodRepository;
-        this.supplierRepository = supplierRepository;
+        this.counterpartRepository = counterpartRepository;
         this.modelMapper = modelMapper;
         this.goodService = goodService;
-        this.supplierService = supplierService;
+        this.counterpartService = counterpartService;
         this.goodOperationRepository = goodOperationRepository;
         this.goodCardRepository = goodCardRepository;
-        this.ratingRepository1 = ratingRepository1;
+        this.ratingRepository = ratingRepository;
     }
 
     // создать или изменить карточку товара
     @PostMapping("/create/change/goodcard")
     public String createOrChangeGoodCard(@RequestBody GoodCardDTO goodCardDTO) {
-        return goodService.createOrChangeGoodCard1(goodCardDTO);
+        return goodService.createOrChangeGoodCard(goodCardDTO);
     }
 
     // карточка товара по наименованию товара
+    // Optional
     @GetMapping("/good/card/{name}")
     public GoodCard findGoodCardByGoodId(@PathVariable("name") String name) {
         return goodCardRepository.findGoodCardByGoodId(name);
     }
 
-    // купить или продать товар
-    @PostMapping("/operation")
-    public GoodDTOOperation1 createGoodDTOOperation1(@RequestParam("operation") String operation
-            , @RequestBody List<GoodDTO1> goodsDTO1) {
-        return goodService.createGoodsDTOOperation1(goodsDTO1, operation);
+    // поставить товар
+    @PostMapping("/supply")
+    public GoodOperationDTO supplyGoods(@RequestBody List<GoodDTO> goodsDTO) {
+        return goodService.supplyGoods(goodsDTO);
+    }
+
+    // продать товар
+    @PostMapping("/sell")
+    public GoodOperationDTO sellGoods(@RequestBody List<GoodDTO> goodsDTO) {
+        return goodService.sellGoods(goodsDTO);
     }
 
     // доступное количество товара на складе на определенную дату
@@ -86,9 +92,9 @@ public class GoodController {
     // аналитика по рейтингам
     // рейтинг из журнала рейтингов по наименованию товара и наименованию покупателя
     @GetMapping("/get/for/rating1")
-    public Optional<Rating> findByGoodAndSupplier(@RequestParam("goodName") String goodName,
-                                                  @RequestParam("supplierName") String supplierName) {
-        return ratingRepository1.findByGoodAndSupplier(goodName, supplierName);
+    public Optional<Rating> findByGoodAndCounterpart(@RequestParam("goodName") String goodName,
+                                                  @RequestParam("counterpartName") String counterpartName) {
+        return ratingRepository.findByGoodAndCounterpart(goodName, counterpartName);
     }
 
     // аналитика по журналу операций
@@ -100,16 +106,16 @@ public class GoodController {
 
     // журнал операций купли/продажи по наименованию контрагента
     @GetMapping("/operations/counterpartname")
-    public List<GoodOperation> getGoodOperationsBySupplierName(@RequestParam("supplierName") String supplierName) {
-        return goodOperationRepository.getGoodOperationsBySupplierName(supplierName);
+    public List<GoodOperation> getGoodOperationsByCounterpartName(@RequestParam("counterpartName") String counterpartName) {
+        return goodOperationRepository.getGoodOperationsByCounterpartName(counterpartName);
     }
 
     // журнал операций купли/продажи по наименованию операции и наименованию контрагента
     @GetMapping("/operations/operationname/counterpartname")
-    public List<GoodOperation> getGoodOperationsByOperationAndSupplierName(
+    public List<GoodOperation> getGoodOperationsByOperationAndCounterpartName(
             @RequestParam("operationCurrent") String operationCurrent,
-            @RequestParam("supplierName") String supplierName) {
-        return goodOperationRepository.getGoodOperationsByOperationAndSupplierName(operationCurrent, supplierName);
+            @RequestParam("counterpartName") String counterpartName) {
+        return goodOperationRepository.getGoodOperationsByOperationAndCounterpartName(operationCurrent, counterpartName);
     }
 
     // журнал операций купли/продажи за указанный период
@@ -120,12 +126,12 @@ public class GoodController {
 
     // журнал операций купли/продажи по наименованию операции и наименованию контрагента за указанный период
     @GetMapping("/operations/counterpart/date")
-    public List<GoodOperation> geOperationsByOperationAndSupplierNameAndDate(
+    public List<GoodOperation> geOperationsByOperationAndCounterpartNameAndDate(
             @RequestParam("operationCurrent") String operationCurrent,
-            @RequestParam("supplierName") String supplierName,
+            @RequestParam("counterpartName") String counterpartName,
             @RequestParam("dateFrom") Date dateFrom, @RequestParam("dateTo") Date dateTo) {
-        return goodOperationRepository.getOperationsByOperationAndSupplierNameAndDate(operationCurrent,
-                supplierName, dateFrom, dateTo);
+        return goodOperationRepository.getOperationsByOperationAndCounterpartNameAndDate(operationCurrent,
+                counterpartName, dateFrom, dateTo);
     }
 
     // аналитика по товарам
@@ -138,8 +144,8 @@ public class GoodController {
     // аналитика по контрагентам
     // список контрагентов по наименованию товара
     @GetMapping("/counterparts/goodname")
-    public List<Supplier> findCounterpartsByGoodName(@RequestParam("name") String name) {
-        return supplierRepository.findCounterpartsByGoodName(name);
+    public List<Counterpart> findCounterpartsByGoodName(@RequestParam("name") String name) {
+        return counterpartRepository.findCounterpartsByGoodName(name);
     }
 
 //    @PostMapping("/create/good")
