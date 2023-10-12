@@ -73,19 +73,19 @@ public class GoodController {
     // Рейтинги
     // поставить оценку можно только один раз
     @PostMapping("/set/rating")
-    public RatingDTOForCustomer setRating(@RequestBody RatingDTO ratingDTO) {
+    public String setRating(@RequestBody RatingDTO ratingDTO) {
         return goodService.setRating(ratingDTO);
     }
 
     // изменить оценку можно только один раз
     @PostMapping("/change/rating")
-    public RatingDTOForCustomer changeRating(@RequestBody RatingDTO ratingDTO) {
+    public String changeRating(@RequestBody RatingDTO ratingDTO) {
         return goodService.changeRating(ratingDTO);
     }
 
     // удалить оценку можно только один раз
     @PostMapping("/delete/rating")
-    public RatingDTOForCustomer deleteRating(@RequestBody RatingDTO ratingDTO) {
+    public String deleteRating(@RequestBody RatingDTO ratingDTO) {
         return goodService.deleteRating(ratingDTO);
     }
 

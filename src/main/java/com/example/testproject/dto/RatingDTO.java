@@ -12,5 +12,14 @@ import lombok.Setter;
 public class RatingDTO {
     private double value;
     private String goodName;
-    private String customerName;
+    private String counterpartName;
+
+    @Override
+    public String toString() {
+        return "RatingDTO{" +
+                "value=" + value +
+                ", goodName='" + goodName + '\'' +
+                ", counterpartName='" + counterpartName + '\'' +
+                '}';
+    }
 }

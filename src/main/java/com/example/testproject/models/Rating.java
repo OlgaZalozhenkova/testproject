@@ -49,18 +49,4 @@ public class Rating {
         this.good = good;
         this.counterpart = counterpart;
     }
-
-    //    @ManyToMany
-//    @JoinTable(name = "rating_supplier",
-//            joinColumns = @JoinColumn(name = "rating_id"),
-//            inverseJoinColumns = @JoinColumn(name = "supplier_id"))
-//   // @JoinColumn(name = "supplier_id", referencedColumnName = "id")
-//    List<Supplier> suppliers;
-
-//    public Rating(double value, String goodName, Good good, List<Supplier> suppliers) {
-//        this.value = value;
-//        this.goodName = goodName;
-//        this.good = good;
-//        this.suppliers = suppliers;
-//    }
 }

@@ -3,6 +3,7 @@ package com.example.testproject.servicies;
 import com.example.testproject.dto.*;
 import com.example.testproject.mapper.GoodCardMapper;
 import com.example.testproject.mapper.GoodMapper;
+import com.example.testproject.mapper.RatingMapper;
 import com.example.testproject.models.*;
 import com.example.testproject.repositories.*;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,7 @@ public class GoodService {
     RatingRepository ratingRepository;
     GoodCardMapper goodCardMapper;
     GoodMapper goodMapper;
+    RatingMapper ratingMapper;
 
     @Transactional
     public String createOrChangeGoodCard(GoodCardDTO goodCardDTO) {
@@ -132,18 +134,16 @@ public class GoodService {
             } else {
 
                 // проверка проведения существующим контрагентом операций с данным товаром
-                boolean isExist = counterpartsDB.contains(counterpartDB);
-
                 //контрагент операции с данным товаром не проводил, в списке отсутствует
-                if (!isExist) {
+                if (!counterpartsDB.contains(counterpartDB)) {
                     counterpartsDB.add(counterpartDB);
                     goodDB.setCounterparts(counterpartsDB);
                 }
             }
         }
         // запись операции по товару в БД в табл. good_operations
-        createGoodOperation(goodDTO,goodDB,
-                counterpartDB,"supply");
+        createGoodOperation(goodDTO, goodDB,
+                counterpartDB, "supply");
         return goodDB;
     }
 
@@ -195,25 +195,23 @@ public class GoodService {
 
             } else {
                 // проверка проведения существующим контрагентом операций с данным товаром
-                boolean isExist = counterpartsDB.contains(counterpartDB);
-
                 //контрагент операции с данным товаром не проводил, в списке отсутствует
-                if (!isExist) {
+                if (!counterpartsDB.contains(counterpartDB)) {
                     counterpartsDB.add(counterpartDB);
                     goodDB.setCounterparts(counterpartsDB);
                 }
             }
 
-            createGoodOperation(goodDTO,goodDB,
-                    counterpartDB,"selling");
+            createGoodOperation(goodDTO, goodDB,
+                    counterpartDB, "selling");
 
             return goodDB;
         }
     }
 
-    @Transactional
-    public void createGoodOperation(GoodDTO goodDTO,Good goodDB,
-                                    Counterpart counterpartDB,String operationType) {
+//    @Transactional
+    public void createGoodOperation(GoodDTO goodDTO, Good goodDB,
+                                    Counterpart counterpartDB, String operationType) {
         GoodOperation goodOperation = GoodOperation.builder()
                 .item(goodDTO.getName())
                 .operationCurrent(operationType)
@@ -233,7 +231,7 @@ public class GoodService {
     public GoodOperationDTO supplyGoods(List<GoodDTO> goodsDTO) {
         int totalSum = 0;
         for (GoodDTO goodDTO : goodsDTO
-                //исключения
+            //исключения, все или ничего
         ) {
             if (supplyGood(goodDTO) == null) {
                 return null;
@@ -247,6 +245,7 @@ public class GoodService {
     public GoodOperationDTO sellGoods(List<GoodDTO> goodsDTO) {
         int totalSum = 0;
         for (GoodDTO goodDTO : goodsDTO
+            //исключения, все или ничего
         ) {
             if (sellGood(goodDTO) == null) {
                 return null;
@@ -255,105 +254,115 @@ public class GoodService {
         return new GoodOperationDTO(goodsDTO, totalSum);
     }
 
+    // нужен диапазон оценок
     @Transactional
-    public RatingDTOForCustomer setRating(RatingDTO ratingDTO) {
+    public String setRating(RatingDTO ratingDTO) {
 
-        String counterpartName = ratingDTO.getCustomerName();
+        String counterpartName = ratingDTO.getCounterpartName();
         String goodName = ratingDTO.getGoodName();
 
         Good good = goodRepository.findByName(goodName);
         Counterpart counterpart = counterpartRepository.findByName(counterpartName);
+        if (good == null || counterpart == null) {
+            return null;
+        }
+
         Rating ratingDB = ratingRepository.findByCounterpartAndGood(counterpart, good);
 
+        // оценивать товар можно только один раз
         if (ratingDB == null) {
-            // товар именно купленный этим контрагентом
+            // товар для добавления рейтинга должен быть куплен этим контрагентом
+            // можно оценивать только купленный товар
             Good goodForSetRating = goodRepository
-                    .getGoodForRating("selling", counterpartName, goodName);
+                    .getGoodForSetRating("selling", counterpartName, goodName);
 
-            if (counterpart == null || goodForSetRating == null) {
+            if (goodForSetRating == null) {
                 return null; // исключение
             }
-            Rating rating = modelMapper.map(ratingDTO, Rating.class);
+//            Rating rating = modelMapper.map(ratingDTO, Rating.class);
+            Rating rating = ratingMapper.ratingDTOToRating(ratingDTO);
             rating.setGood(goodForSetRating);
             rating.setCounterpart(counterpart);
+
+            // не нужно
             rating.setChanged(false);
+            rating.setDeleted(false);
 
             ratingRepository.save(rating);
             GoodCard goodCard = goodCardRepository.findByName(goodName);
 
-            double ratingDB = goodCard.getRating();
-            double countValue = goodCard.getCountValue();
+            double countValue = goodCard.getCountValue()+1;
 
-            double countValueNew = countValue + 1;
-            double value = ratingDTO.getValue();
-            double ratingNewGoodCard = (ratingDB + value) / countValueNew;
+            goodCard.setRating((goodCard.getRating() + ratingDTO.getValue()) / countValue);
+            goodCard.setCountValue(countValue);
 
-            goodCard.setRating(ratingNewGoodCard);
-            goodCard.setCountValue(countValueNew);
-
-            goodCardRepository.save(goodCard);
-
-            RatingDTOForCustomer ratingDTOForCustomer = modelMapper.map(rating,
-                    RatingDTOForCustomer.class);
-            ratingDTOForCustomer.setMessage("Your evaluation is " + value);
-            return ratingDTOForCustomer;
+            return ratingDTO.toString();
         } else return null;
     }
 
     @Transactional
-    public RatingDTOForCustomer changeRating(RatingDTO ratingDTO) {
+    public String changeRating(RatingDTO ratingDTO) {
 
-        String sellerName = ratingDTO.getCustomerName();
+        String counterpartName = ratingDTO.getCounterpartName();
         String goodName = ratingDTO.getGoodName();
-        double valueDTO = ratingDTO.getValue();
 
-        Counterpart counterpart = counterpartRepository.findByName(sellerName);
         Good good = goodRepository.findByName(goodName);
-        Rating ratingExistDB = ratingRepository.findByCounterpartAndGood(counterpart, good);
+        Counterpart counterpart = counterpartRepository.findByName(counterpartName);
+        if (good == null || counterpart == null) {
+            return null;
+        }
 
-        if (ratingExistDB == null || ratingExistDB.isChanged() || ratingExistDB.isDeleted()) {
+        Rating ratingDB = ratingRepository.findByCounterpartAndGood(counterpart, good);
+
+        if (ratingDB == null || ratingDB.isChanged() || ratingDB.isDeleted()) {
             return null; //исключение
         } else {
-            double valueDB = ratingExistDB.getValue();
-            ratingExistDB.setValue(valueDTO);
-            ratingExistDB.setChanged(true);
             GoodCard goodCard = goodCardRepository.findByName(goodName);
             double currentRating = goodCard.getRating();
             double countValue = goodCard.getCountValue();
-            double ratingNew = (currentRating * countValue - valueDB + valueDTO) / countValue;
-            goodCard.setRating(ratingNew);
-
-            RatingDTOForCustomer ratingDTOForCustomer = new RatingDTOForCustomer(valueDTO,
-                    "Your have changed evaluation to " + valueDTO);
-            return ratingDTOForCustomer;
+            goodCard.setRating((currentRating * countValue - ratingDB.getValue()
+                    + ratingDTO.getValue()) / countValue);
+            ratingDB.setValue(ratingDTO.getValue());
+            ratingDB.setChanged(true);
+            goodCardRepository.save(goodCard);
+            return ratingDTO.toString();
         }
     }
 
     @Transactional
-    public RatingDTOForCustomer deleteRating(RatingDTO ratingDTO) {
+    public String deleteRating(RatingDTO ratingDTO) {
 
-        String sellerName = ratingDTO.getCustomerName();
+        String counterpartName = ratingDTO.getCounterpartName();
         String goodName = ratingDTO.getGoodName();
 
-        Counterpart counterpart = counterpartRepository.findByName(sellerName);
         Good good = goodRepository.findByName(goodName);
-        Rating ratingExistDB = ratingRepository.findByCounterpartAndGood(counterpart, good);
+        Counterpart counterpart = counterpartRepository.findByName(counterpartName);
+        if (good == null || counterpart == null) {
+            return null;
+        }
 
-        if (ratingExistDB == null || ratingExistDB.isDeleted()) {
+        Rating ratingDB = ratingRepository.findByCounterpartAndGood(counterpart, good);
+
+        if (ratingDB == null || ratingDB.isDeleted()) {
             return null; //исключение
+
         } else {
-            double valueDB = ratingExistDB.getValue();
-            ratingExistDB.setDeleted(true);
+
+            ratingDB.setDeleted(true);
             GoodCard goodCard = goodCardRepository.findByName(goodName);
             double currentRating = goodCard.getRating();
             double countValue = goodCard.getCountValue();
-            double ratingNew = (currentRating * countValue - valueDB) / (countValue - 1);
-            goodCard.setRating(ratingNew);
-            goodCard.setCountValue(countValue - 1);
 
-            RatingDTOForCustomer ratingDTOForCustomer = new RatingDTOForCustomer(valueDB,
-                    "Your have removed your evaluation " + valueDB);
-            return ratingDTOForCustomer;
+            // в карточке существует единственная оценка этого покупателя
+            if (countValue == 1) {
+                goodCard.setCountValue(0);
+                goodCard.setRating(0);
+            } else {
+                goodCard.setRating((currentRating * countValue - ratingDTO.getValue())
+                        / (countValue - 1));
+                goodCard.setCountValue(countValue - 1);
+            }
+            return ratingDTO.toString();
         }
     }
 
