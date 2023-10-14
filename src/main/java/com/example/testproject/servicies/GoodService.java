@@ -209,7 +209,7 @@ public class GoodService {
         }
     }
 
-//    @Transactional
+    @Transactional
     public void createGoodOperation(GoodDTO goodDTO, Good goodDB,
                                     Counterpart counterpartDB, String operationType) {
         GoodOperation goodOperation = GoodOperation.builder()
@@ -279,14 +279,10 @@ public class GoodService {
             if (goodForSetRating == null) {
                 return null; // исключение
             }
-//            Rating rating = modelMapper.map(ratingDTO, Rating.class);
+
             Rating rating = ratingMapper.ratingDTOToRating(ratingDTO);
             rating.setGood(goodForSetRating);
             rating.setCounterpart(counterpart);
-
-            // не нужно
-            rating.setChanged(false);
-            rating.setDeleted(false);
 
             ratingRepository.save(rating);
             GoodCard goodCard = goodCardRepository.findByName(goodName);
