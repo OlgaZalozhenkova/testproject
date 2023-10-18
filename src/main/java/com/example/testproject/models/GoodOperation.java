@@ -22,31 +22,35 @@ public class GoodOperation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    int id;
+    private int id;
 
     @Column(name = "item")
-    String item;
+    private String item;
 
-    @Column(name = "operation_current")
-    String operationCurrent;
+    @Column(name = "operation")
+    @Enumerated(EnumType.STRING)
+    private OperationType operationType;
 
     @Column(name = "operation_price")
-    int price;
+    private int price;
 
     @Column(name = "operation_quantity")
-    int quantity;
+    private int quantity;
 
     @Column(name = "supplier_name")
-    String counterpartName;
+    private String counterpartName;
 
     @Column(name = "date")
-    Date date;
+    private Date date;
 
     @Column(name = "price_db")
-    int priceDB;
+    private int priceDB;
 
     @Column(name = "quantity_db")
-    int quantityDB;
+    private int quantityDB;
+
+    @Column(name = "sales_income")
+    private int salesIncome;
 
     @JsonIgnore
     @ManyToOne
@@ -58,15 +62,29 @@ public class GoodOperation {
     @JoinColumn(name = "supplier_id", referencedColumnName = "id")
     private Counterpart counterpart;
 
-    public GoodOperation(String item, String operationCurrent, int price, int quantity, String counterpartName, Date date, int priceDB, int quantityDB, Good good, Counterpart counterpart) {
+    public GoodOperation(String item, OperationType operationType, int price, int quantity, String counterpartName, Date date, int priceDB, int quantityDB, Good good, Counterpart counterpart) {
         this.item = item;
-        this.operationCurrent = operationCurrent;
+        this.operationType = operationType;
         this.price = price;
         this.quantity = quantity;
         this.counterpartName = counterpartName;
         this.date = date;
         this.priceDB = priceDB;
         this.quantityDB = quantityDB;
+        this.good = good;
+        this.counterpart = counterpart;
+    }
+
+    public GoodOperation(String item, OperationType operationType, int price, int quantity, String counterpartName, Date date, int priceDB, int quantityDB, int salesIncome, Good good, Counterpart counterpart) {
+        this.item = item;
+        this.operationType = operationType;
+        this.price = price;
+        this.quantity = quantity;
+        this.counterpartName = counterpartName;
+        this.date = date;
+        this.priceDB = priceDB;
+        this.quantityDB = quantityDB;
+        this.salesIncome = salesIncome;
         this.good = good;
         this.counterpart = counterpart;
     }

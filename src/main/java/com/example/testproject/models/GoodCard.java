@@ -29,10 +29,10 @@ public class GoodCard {
     private String name;
 
     @Column(name = "price_supply")
-    int priceSupply;
+    private int priceSupply;
 
     @Column(name = "price_selling")
-    int priceSelling;
+    private int priceSelling;
 
     @Column(name = "available_quantity")
     private int availableQuantity;
@@ -46,14 +46,9 @@ public class GoodCard {
     @Column(name = "count_value")
     private double countValue;
 
-//    @JsonIgnore
-//    @OneToOne
-//    @JoinColumn(name = "good_id", referencedColumnName = "id")
-//    Good good;
-
     @JsonIgnore
     @OneToOne(mappedBy = "goodCard")
-    Good good;
+    private Good good;
 
     public GoodCard(String name, int priceSupply, int priceSelling, int availableQuantity, int sellQuantity, double rating, double countValue) {
         this.name = name;

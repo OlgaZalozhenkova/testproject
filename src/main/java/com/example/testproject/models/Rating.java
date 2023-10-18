@@ -1,6 +1,7 @@
 package com.example.testproject.models;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -21,23 +22,24 @@ public class Rating {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    private int id;
 
     @Column(name = "value")
-    double value;
+    private double value;
 
     @Column(name = "good_name")
-    String goodName;
+    private String goodName;
 
     @Column(name = "is_changed")
-    boolean isChanged;
+    private boolean isChanged;
 
     @Column(name = "is_deleted")
-    boolean isDeleted;
+    private boolean isDeleted;
 
     @ManyToOne
     @JoinColumn(name = "good_id", referencedColumnName = "id")
-    Good good;
+    @JsonIgnore
+    private Good good;
 
     @ManyToOne
     @JoinColumn(name = "supplier_id", referencedColumnName = "id")

@@ -11,10 +11,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class GoodDTO {
-
     private String name;
     private int price;
     private int quantity;
     private String counterpartName;
-
 }

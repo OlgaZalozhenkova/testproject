@@ -15,9 +15,4 @@ public interface CounterpartRepository extends JpaRepository<Counterpart,Integer
 
     Counterpart findByName(String name);
 
-//    @Query("select s from Supplier s join s.ratings rating where s.name =:name")
-//    Supplier findRatingBySupplierName(String name);
-
-//@Query("select s from Supplier s where s.id = :id")
-//Supplier getSupplierByIdQuery(int id);
 }

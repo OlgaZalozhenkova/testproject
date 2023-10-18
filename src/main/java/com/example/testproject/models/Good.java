@@ -23,16 +23,19 @@ public class Good {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    private int id;
 
     @Column(name = "name")
-    String name;
+    private String name;
 
     @Column(name = "price")
-    int price;
+    private int price;
 
     @Column(name = "quantity")
-    int quantity;
+    private int quantity;
+
+    @Column(name ="sales_income")
+    int salesIncome;
 
     @JsonIgnore
     @ManyToMany
@@ -45,10 +48,6 @@ public class Good {
     @OneToMany(mappedBy = "good")
     private List<GoodOperation> goodOperations;
 
-//    @JsonIgnore
-//    @OneToOne(mappedBy = "good")
-//    private GoodCard goodCard;
-
     @JsonIgnore
     @OneToOne
     @JoinColumn(name = "good_card_id", referencedColumnName = "id")
@@ -56,7 +55,7 @@ public class Good {
 
     @JsonIgnore
     @OneToMany(mappedBy = "good")
-    List<Rating> ratings;
+    private List<Rating> ratings;
 
     public Good(String name, int price, int quantity) {
         this.name = name;

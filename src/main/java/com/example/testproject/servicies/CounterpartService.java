@@ -1,17 +1,21 @@
 package com.example.testproject.servicies;
 
+import com.example.testproject.models.Counterpart;
 import com.example.testproject.repositories.GoodRepository;
 import com.example.testproject.repositories.CounterpartRepository;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @Service
-@Getter
-@Setter
+@AllArgsConstructor
 @Transactional(readOnly = true)
 public class CounterpartService {
 
@@ -19,10 +23,8 @@ public class CounterpartService {
     private  final GoodRepository goodRepository;
     private final ModelMapper modelMapper;
 
-    @Autowired
-    public CounterpartService(CounterpartRepository counterpartRepository, GoodRepository goodRepository, ModelMapper modelMapper) {
-        this.counterpartRepository = counterpartRepository;
-        this.goodRepository = goodRepository;
-        this.modelMapper = modelMapper;
+    public List<Counterpart> findCounterpartsByGoodName(String name) {
+        return counterpartRepository.findCounterpartsByGoodName(name);
     }
- }
+
+}

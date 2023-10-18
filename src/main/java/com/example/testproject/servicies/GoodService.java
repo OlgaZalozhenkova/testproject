@@ -1,52 +1,32 @@
 package com.example.testproject.servicies;
 
-import com.example.testproject.dto.*;
-import com.example.testproject.mapper.GoodCardMapper;
+import com.example.testproject.dto.GoodDTO;
+import com.example.testproject.dto.GoodOperationDTO;
+import com.example.testproject.dto.GoodOperationSpecificationDTO;
 import com.example.testproject.mapper.GoodMapper;
-import com.example.testproject.mapper.RatingMapper;
 import com.example.testproject.models.*;
-import com.example.testproject.repositories.*;
+import com.example.testproject.repositories.CounterpartRepository;
+import com.example.testproject.repositories.GoodCardRepository;
+import com.example.testproject.repositories.GoodOperationRepository;
+import com.example.testproject.repositories.GoodRepository;
 import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 @Transactional(readOnly = true)
 public class GoodService {
-    GoodRepository goodRepository;
-    CounterpartRepository counterpartRepository;
-    ModelMapper modelMapper;
-    GoodOperationRepository goodOperationRepository;
-    GoodCardRepository goodCardRepository;
-    RatingRepository ratingRepository;
-    GoodCardMapper goodCardMapper;
-    GoodMapper goodMapper;
-    RatingMapper ratingMapper;
-
-    @Transactional
-    public String createOrChangeGoodCard(GoodCardDTO goodCardDTO) {
-
-        GoodCard goodCardDB = goodCardRepository.findByName(goodCardDTO.getName());
-
-        int valueForSupplyNew = goodCardDTO.getValueForSupply();
-        int valueForSellingNew = goodCardDTO.getValueForSelling();
-
-        if (goodCardDB == null) {
-            GoodCard goodCard = goodCardMapper.map(goodCardDTO);
-            goodCardRepository.save(goodCard);
-            return goodCard.toString();
-        } else {
-            goodCardDB.setPriceSupply(valueForSupplyNew);
-            goodCardDB.setPriceSelling(valueForSellingNew);
-            return goodCardDB.toString();
-        }
-    }
+    private final GoodRepository goodRepository;
+    private final CounterpartRepository counterpartRepository;
+    private final GoodOperationRepository goodOperationRepository;
+    private final GoodCardRepository goodCardRepository;
+    private final GoodMapper goodMapper;
+    private  final GoodOperationSpecificationService goodOperationSpecificationService;
 
     @Transactional
     public Good supplyGood(GoodDTO goodDTO) {
@@ -143,7 +123,8 @@ public class GoodService {
         }
         // запись операции по товару в БД в табл. good_operations
         createGoodOperation(goodDTO, goodDB,
-                counterpartDB, "supply");
+                counterpartDB, OperationType.SUPPLY);
+
         return goodDB;
     }
 
@@ -174,6 +155,8 @@ public class GoodService {
             int priceNew = 0;
             int priceDB = goodDB.getPrice();
 
+            int salesIncome = ((goodDTO.getPrice() - goodDB.getPrice()) * goodDTO.getQuantity());
+
             int quantityNew = quantityDB - quantity;
             if (quantityNew != 0) {
                 priceNew = (priceDB * quantityDB - priceDB * quantity) / quantityNew;
@@ -203,18 +186,19 @@ public class GoodService {
             }
 
             createGoodOperation(goodDTO, goodDB,
-                    counterpartDB, "selling");
+                    counterpartDB, OperationType.SELLING).setSalesIncome(salesIncome);
+            goodDB.setSalesIncome(goodDB.getSalesIncome() + salesIncome);
 
             return goodDB;
         }
     }
 
     @Transactional
-    public void createGoodOperation(GoodDTO goodDTO, Good goodDB,
-                                    Counterpart counterpartDB, String operationType) {
+    public GoodOperation createGoodOperation(GoodDTO goodDTO, Good goodDB,
+                                             Counterpart counterpartDB, OperationType operationType) {
         GoodOperation goodOperation = GoodOperation.builder()
                 .item(goodDTO.getName())
-                .operationCurrent(operationType)
+                .operationType(operationType)
                 .price(goodDTO.getPrice())
                 .quantity(goodDTO.getQuantity())
                 .counterpartName(goodDTO.getCounterpartName())
@@ -224,7 +208,7 @@ public class GoodService {
                 .good(goodDB)
                 .counterpart(counterpartDB) // контрагент либо уже существовал в БД либо его сохранили как нового
                 .build();
-        goodOperationRepository.save(goodOperation);
+        return goodOperationRepository.save(goodOperation);
     }
 
     @Transactional
@@ -250,124 +234,66 @@ public class GoodService {
             if (sellGood(goodDTO) == null) {
                 return null;
             }
+            totalSum += goodDTO.getPrice() * goodDTO.getQuantity();
         }
         return new GoodOperationDTO(goodsDTO, totalSum);
     }
 
-    // нужен диапазон оценок
-    @Transactional
-    public String setRating(RatingDTO ratingDTO) {
 
-        String counterpartName = ratingDTO.getCounterpartName();
-        String goodName = ratingDTO.getGoodName();
-
-        Good good = goodRepository.findByName(goodName);
-        Counterpart counterpart = counterpartRepository.findByName(counterpartName);
-        if (good == null || counterpart == null) {
-            return null;
-        }
-
-        Rating ratingDB = ratingRepository.findByCounterpartAndGood(counterpart, good);
-
-        // оценивать товар можно только один раз
-        if (ratingDB == null) {
-            // товар для добавления рейтинга должен быть куплен этим контрагентом
-            // можно оценивать только купленный товар
-            Good goodForSetRating = goodRepository
-                    .getGoodForSetRating("selling", counterpartName, goodName);
-
-            if (goodForSetRating == null) {
-                return null; // исключение
-            }
-
-            Rating rating = ratingMapper.ratingDTOToRating(ratingDTO);
-            rating.setGood(goodForSetRating);
-            rating.setCounterpart(counterpart);
-
-            ratingRepository.save(rating);
-            GoodCard goodCard = goodCardRepository.findByName(goodName);
-
-            double countValue = goodCard.getCountValue()+1;
-
-            goodCard.setRating((goodCard.getRating() + ratingDTO.getValue()) / countValue);
-            goodCard.setCountValue(countValue);
-
-            return ratingDTO.toString();
-        } else return null;
+    public Optional<Integer> getGoodsAvailableQuantityByDate(String item, Date date) {
+        return goodOperationRepository.getGoodOperationsByItemAndDate(item, date);
     }
 
-    @Transactional
-    public String changeRating(RatingDTO ratingDTO) {
-
-        String counterpartName = ratingDTO.getCounterpartName();
-        String goodName = ratingDTO.getGoodName();
-
-        Good good = goodRepository.findByName(goodName);
-        Counterpart counterpart = counterpartRepository.findByName(counterpartName);
-        if (good == null || counterpart == null) {
-            return null;
+    public  int getSalesIncomeForPeriod(Date dateFrom, Date dateTo) {
+        List<GoodOperation> goodOperations = goodOperationRepository
+                .getSalesIncomeForPeriod(dateFrom, dateTo);
+        int salesIncome = 0;
+        for (GoodOperation goodOperation : goodOperations
+        ) {
+            salesIncome += goodOperation.getSalesIncome();
         }
-
-        Rating ratingDB = ratingRepository.findByCounterpartAndGood(counterpart, good);
-
-        if (ratingDB == null || ratingDB.isChanged() || ratingDB.isDeleted()) {
-            return null; //исключение
-        } else {
-            GoodCard goodCard = goodCardRepository.findByName(goodName);
-            double currentRating = goodCard.getRating();
-            double countValue = goodCard.getCountValue();
-            goodCard.setRating((currentRating * countValue - ratingDB.getValue()
-                    + ratingDTO.getValue()) / countValue);
-            ratingDB.setValue(ratingDTO.getValue());
-            ratingDB.setChanged(true);
-            goodCardRepository.save(goodCard);
-            return ratingDTO.toString();
-        }
+        return salesIncome;
     }
 
-    @Transactional
-    public String deleteRating(RatingDTO ratingDTO) {
-
-        String counterpartName = ratingDTO.getCounterpartName();
-        String goodName = ratingDTO.getGoodName();
-
-        Good good = goodRepository.findByName(goodName);
-        Counterpart counterpart = counterpartRepository.findByName(counterpartName);
-        if (good == null || counterpart == null) {
-            return null;
+    public  int getSalesIncomeGoodForPeriod(String item, Date dateFrom, Date dateTo) {
+        List<GoodOperation> goodOperations = goodOperationRepository
+                .getSalesIncomeGoodForPeriod(item, dateFrom, dateTo);
+        int salesIncome = 0;
+        for (GoodOperation goodOperation : goodOperations
+        ) {
+            salesIncome += goodOperation.getSalesIncome();
         }
+        return salesIncome;
+       }
 
-        Rating ratingDB = ratingRepository.findByCounterpartAndGood(counterpart, good);
-
-        if (ratingDB == null || ratingDB.isDeleted()) {
-            return null; //исключение
-
-        } else {
-
-            ratingDB.setDeleted(true);
-            GoodCard goodCard = goodCardRepository.findByName(goodName);
-            double currentRating = goodCard.getRating();
-            double countValue = goodCard.getCountValue();
-
-            // в карточке существует единственная оценка этого покупателя
-            if (countValue == 1) {
-                goodCard.setCountValue(0);
-                goodCard.setRating(0);
-            } else {
-                goodCard.setRating((currentRating * countValue - ratingDTO.getValue())
-                        / (countValue - 1));
-                goodCard.setCountValue(countValue - 1);
-            }
-            return ratingDTO.toString();
+    public  int getSalesIncomeCounterpartGoodForPeriod(String counterpartName,
+                                                       String item, Date dateFrom, Date dateTo) {
+        List<GoodOperation> goodOperations = goodOperationRepository
+                .getSalesIncomeCounterpartNameGoodForPeriod(counterpartName,item, dateFrom, dateTo);
+        int salesIncome = 0;
+        for (GoodOperation goodOperation : goodOperations
+        ) {
+            salesIncome += goodOperation.getSalesIncome();
         }
+        return salesIncome;
     }
 
-    public String getGoodsAvailableQuantityByDate(String item, Date date) {
+    public  int getSalesIncomeFilter(GoodOperationSpecificationDTO goodOperationSpecificationDTO) {
+        List<GoodOperation> goodOperations = goodOperationSpecificationService.getOperationsToGetIncome(goodOperationSpecificationDTO);
+        int salesIncome = 0;
+        for (GoodOperation goodOperation : goodOperations
+        ) {
+            salesIncome += goodOperation.getSalesIncome();
+        }
+        return salesIncome;
+    }
 
-        int availableQuantity = goodOperationRepository
-                .getGoodOperationsByItemAndDate(item, date);
+    public List<Good> findAll() {
+        return goodRepository.findAll();
+    }
 
-        return "Available quantity of " + item + " is " + availableQuantity;
+    public List<Good> getGoodsByCounterPartName(String counterpartName) {
+        return goodRepository.getGoodsByCounterPartName(counterpartName);
     }
 }
 
