@@ -3,6 +3,7 @@ package com.example.testproject.controllers;
 import com.example.testproject.dto.GoodCardDTO;
 import com.example.testproject.models.GoodCard;
 import com.example.testproject.servicies.GoodCardService;
+import com.example.testproject.util.DataNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,9 @@ public class GoodCardController {
     // Optional
     @GetMapping("/{name}")
     public GoodCard findGoodCardByGoodName(@PathVariable("name") String name) {
-        return goodCardService.findGoodCardByGoodName(name);
+        GoodCard goodCard = goodCardService.findGoodCardByGoodName(name);
+        if (goodCard != null) {
+            return goodCard;
+        } else throw new DataNotFoundException();
     }
 }

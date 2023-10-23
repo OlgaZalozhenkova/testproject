@@ -4,6 +4,8 @@ import com.example.testproject.dto.GoodDTO;
 import com.example.testproject.dto.GoodOperationDTO;
 import com.example.testproject.dto.GoodOperationSpecificationDTO;
 import com.example.testproject.models.Good;
+import com.example.testproject.servicies.GoodService1;
+import com.example.testproject.util.DataNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,11 +14,11 @@ import java.util.List;
 
 
 @RestController
-//@AllArgsConstructor
+@AllArgsConstructor
 @RequestMapping("/good")
 public class GoodController {
 
-   private final GoodService goodService;
+    private final GoodService1 goodService;
 
     // поставить товар
     @PostMapping("/supply")
@@ -34,14 +36,24 @@ public class GoodController {
     // все товары
     @GetMapping("/all")
     public List<Good> findAll() {
-        return goodService.findAll();
+        List<Good> goods = goodService.findAll();
+        if (goods.isEmpty()) {
+            throw new DataNotFoundException();
+        } else {
+            return goods;
+        }
     }
 
     // товары определенного контрагента
     @GetMapping("/counterpart")
     List<Good> getGoodsByCounterpartName(@RequestParam("counterpartName")
                                                  String counterpartName) {
-        return goodService.getGoodsByCounterPartName(counterpartName);
+        List<Good> goods = goodService.getGoodsByCounterPartName(counterpartName);
+        if (goods.isEmpty()) {
+            throw new DataNotFoundException();
+        } else {
+            return goods;
+        }
     }
 
     // доступное количество товара на складе на определенную дату
@@ -52,49 +64,15 @@ public class GoodController {
     }
 
     // аналитика по доходу от продаж
-    // доход от продаж за определенный период времени
-    @GetMapping("/salesincome/period")
-    int getSalesIncomeForPeriod(@RequestParam("dateFrom") Date dateFrom,
-                                @RequestParam("dateTo") Date dateTo) {
-        return goodService.getSalesIncomeForPeriod(dateFrom, dateTo);
+    @GetMapping("/salesincome/filter")
+    int getSalesIncomeFilter(@RequestParam(value = "counterpartName", required = false) String counterpartName,
+                             @RequestParam(value = "item", required = false) String item,
+                             @RequestParam(value = "dateFrom", required = false) Date dateFrom,
+                             @RequestParam(value = "dateTo", required = false) Date dateTo) {
+
+        GoodOperationSpecificationDTO goodOperationSpecificationDTO =
+                new GoodOperationSpecificationDTO(item, counterpartName, dateFrom, dateTo);
+        return goodService.getSalesIncomeFilter(goodOperationSpecificationDTO);
     }
 
-    // доход от продаж определенного товара за определенный период времени
-    @GetMapping("/salesincome/good/period")
-    int getSalesIncomeGoodForPeriod(@RequestParam("item") String item,
-                                    @RequestParam("dateFrom") Date dateFrom,
-                                    @RequestParam("dateTo") Date dateTo) {
-        return goodService.getSalesIncomeGoodForPeriod(item, dateFrom, dateTo);
-    }
-
-    // доход от продаж определенного товара определенному покупателю
-    // за определенный период времени
-    @GetMapping("/salesincome/counterpart/good/period")
-    int getSalesIncomeForPeriod2(@RequestParam("counterpartName") String counterpartName,
-                                 @RequestParam("item") String item,
-                                 @RequestParam("dateFrom") Date dateFrom,
-                                 @RequestParam("dateTo") Date dateTo) {
-        return goodService.getSalesIncomeCounterpartGoodForPeriod(counterpartName,
-                item, dateFrom, dateTo);
-    }
-
-//    @GetMapping("/salesincome/filter")
-//    int getSalesIncomeFilter(@RequestParam("counterpartName") String counterpartName,
-//                             @RequestParam("item") String item,
-//                             @RequestParam("dateFrom") Date dateFrom,
-//                             @RequestParam("dateTo") Date dateTo) {
-//        GoodOperationSpecificationDTO goodOperationSpecificationDTO =
-//                new GoodOperationSpecificationDTO(item,counterpartName,dateFrom,dateTo);
-//        return goodService.
-//    }
-
-//    @PostMapping("/create/good")
-//    public Good createGood(@RequestBody Good good) {
-//        return goodService.createGood(good);
-//    }
-//
-//    @PostMapping("/sell/good")
-//    public Good sellGood(@RequestBody Good good) {
-//        return goodService.sellGood(good);
-//    }
 }

@@ -24,3 +24,5 @@ public class CounterpartController {
         return counterpartService.findCounterpartsByGoodName(name);
     }
 }
+
+

@@ -19,8 +19,8 @@ import java.util.List;
 @RequestMapping("/goodoperation")
 public class GoodOperationController {
 
-    GoodOperationService goodOperationService;
-    GoodOperationSpecificationService goodOperationSpecificationService;
+    private final GoodOperationService goodOperationService;
+    private final GoodOperationSpecificationService goodOperationSpecificationService;
 
     // аналитика по журналу операций
     // все операции
@@ -39,7 +39,7 @@ public class GoodOperationController {
     // журнал операций по наименованию контрагента
     @GetMapping("/counterpart")
     public List<GoodOperation> getGoodOperationsByCounterpartName(@RequestParam("counterpartName") String counterpartName) {
-        return goodOperationService.getGoodOperationByCounterpartName(counterpartName).orElse(null);
+        return goodOperationService.getGoodOperationByCounterpartName(counterpartName);
     }
 
     // журнал операций по типу операции и наименованию контрагента

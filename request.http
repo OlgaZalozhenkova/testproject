@@ -1,4 +1,12 @@
-GET http://localhost:1176/rating/get?goodName=good1&counterpartName=supplier1
+GET http://localhost:1183/good/salesincome/filter
+Accept: application/json
+
+###
+GET http://localhost:1183/good/salesincome/filter?counterpartName=supplier1&item=good1&dateFrom=2023/10/18&dateTo=2023/10/18
+Accept: application/json
+
+###
+GET http://localhost:1191/rating/set?goodName=good22&counterpartName=supplier1
 Accept: application/json
 
 ###
@@ -10,27 +18,27 @@ GET http://localhost:1176/goodoperation/filter?item=good1&operationType=SELLING&
 Accept: application/json
 
 ###
-GET http://localhost:1176/goodoperation/type/counterpart/period?operationType=SELLING&counterpartName=supplier1&dateFrom=2023/10/18&dateTo=2023/10/18
+GET http://localhost:1188/goodoperation/type/counterpart/period?operationType=SELLING&counterpartName=supplier8&dateFrom=2023/10/18&dateTo=2023/10/11
 Accept: application/json
 
 ###
-GET http://localhost:1176/goodoperation/type/counterpart?operationType=SELLING&counterpartName=supplier88
+GET http://localhost:1190/goodoperation/type/counterpart?operationType=SELLING&counterpartName=supplier88
 Accept: application/json
 
 ###
-GET http://localhost:1176/goodoperation/counterpart?counterpartName=supplier88
+GET http://localhost:1185/goodoperation/counterpart?counterpartName=supplier8
 Accept: application/json
 
 ###
-GET http://localhost:1176/goodoperation/period?dateFrom=2023/10/18&dateTo=2023/10/11
+GET http://localhost:1189/goodoperation/period?dateFrom=2023/10/20&dateTo=2023/10/21
 Accept: application/json
 
 ###
-GET http://localhost:1176/goodoperation/all
+GET http://localhost:1185/goodoperation/all
 Accept: application/json
 
 ###
-GET http://localhost:1176/good/salesincome/counterpart/good/period?counterpartName=supplier1&item=good1&dateFrom=2023/10/29&dateTo=2023/10/18
+GET http://localhost:1176/good/salesincome/counterpart/good/period?counterpartName=supplier111&item=good1&dateFrom=2023/10/29&dateTo=2023/10/18
 Accept: application/json
 
 ###
@@ -42,23 +50,23 @@ GET http://localhost:1175/good/salesincome/period?dateFrom=2023/10/18&dateTo=202
 Accept: application/json
 
 ###
-GET http://localhost:1176/good/available/quantity?item=good3&date=2023/10/18
+GET http://localhost:1182/good/available/quantity?item=good99&date=2023/10/18
 Accept: application/json
 
 ###
-GET http://localhost:1175/good/counterpart?counterpartName=supplier8
+GET http://localhost:1183/good/counterpart?counterpartName=supplier8
 Accept: application/json
 
 ###
-GET http://localhost:1174/good/all
+GET http://localhost:1182/good/all
 Accept: application/json
 
 ###
-GET http://localhost:1174/goodcard/good8
+GET http://localhost:1183/goodcard/good111
 Accept: application/json
 
 ###
-GET http://localhost:1173/counterpart/goodname?name=good1
+GET http://localhost:1189/counterpart/goodname?name=good1
 Accept: application/json
 
 ###

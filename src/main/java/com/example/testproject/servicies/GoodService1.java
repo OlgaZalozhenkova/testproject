@@ -9,9 +9,11 @@ import com.example.testproject.repositories.CounterpartRepository;
 import com.example.testproject.repositories.GoodCardRepository;
 import com.example.testproject.repositories.GoodOperationRepository;
 import com.example.testproject.repositories.GoodRepository;
+import com.example.testproject.util.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,28 +22,28 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 @Transactional(readOnly = true)
-public class GoodService {
+public class GoodService1 {
     private final GoodRepository goodRepository;
     private final CounterpartRepository counterpartRepository;
     private final GoodOperationRepository goodOperationRepository;
     private final GoodCardRepository goodCardRepository;
     private final GoodMapper goodMapper;
-    private  final GoodOperationSpecificationService goodOperationSpecificationService;
+    private final GoodOperationSpecificationService goodOperationSpecificationService;
 
     @Transactional
-    public Good supplyGood(GoodDTO goodDTO) {
+    public void supplyGood(GoodDTO goodDTO) {
 
         //проверка наличия карточки товара
         String goodNameForCheck = goodDTO.getName();
         GoodCard goodCard = goodCardRepository.findByName(goodNameForCheck);
         if (goodCard == null) {
-            return null;
+            throw new GoodCardNotFoundException();
         }
 
         // проверка цены поставки
         int priceSupply = goodCard.getPriceSupply();
         if (goodDTO.getPrice() > priceSupply) {
-            return null;
+            throw new PriceNotMatchException();
         }
 
         // проверка наличия товара в БД
@@ -124,30 +126,28 @@ public class GoodService {
         // запись операции по товару в БД в табл. good_operations
         createGoodOperation(goodDTO, goodDB,
                 counterpartDB, OperationType.SUPPLY);
-
-        return goodDB;
     }
 
     @Transactional
-    public Good sellGood(GoodDTO goodDTO) {
+    public void sellGood(GoodDTO goodDTO) {
 
         Good goodDB = goodRepository.findByName(goodDTO.getName());
         if (goodDB == null) {
-            return null;
+            throw new GoodNotFoundException();
         } else {
 
             int quantity = goodDTO.getQuantity();
             int quantityDB = goodDB.getQuantity();
 
             if (quantity > quantityDB) { // не хватает количества товаров
-                return null;
+                throw new QuantityNotEnoughException();
             }
             String item = goodDTO.getName();
             int price = goodDTO.getPrice();
             GoodCard goodCard = goodCardRepository.findByName(item);
             int priceSelling = goodCard.getPriceSelling();
             if (price < priceSelling) {
-                return null; //исключение
+                throw new PriceNotMatchException();
             }
 
             int sellQuantity = goodCard.getSellQuantity();
@@ -188,8 +188,6 @@ public class GoodService {
             createGoodOperation(goodDTO, goodDB,
                     counterpartDB, OperationType.SELLING).setSalesIncome(salesIncome);
             goodDB.setSalesIncome(goodDB.getSalesIncome() + salesIncome);
-
-            return goodDB;
         }
     }
 
@@ -212,28 +210,22 @@ public class GoodService {
     }
 
     @Transactional
-    public GoodOperationDTO supplyGoods(List<GoodDTO> goodsDTO) {
+    public GoodOperationDTO supplyGoods(List<GoodDTO> goodsDTO) throws
+            GoodCardNotFoundException, PriceNotMatchException {
         int totalSum = 0;
-        for (GoodDTO goodDTO : goodsDTO
-            //исключения, все или ничего
-        ) {
-            if (supplyGood(goodDTO) == null) {
-                return null;
-            }
+        for (GoodDTO goodDTO : goodsDTO) {
+            supplyGood(goodDTO);
             totalSum += goodDTO.getPrice() * goodDTO.getQuantity();
         }
         return new GoodOperationDTO(goodsDTO, totalSum);
     }
 
     @Transactional
-    public GoodOperationDTO sellGoods(List<GoodDTO> goodsDTO) {
+    public GoodOperationDTO sellGoods(List<GoodDTO> goodsDTO) throws
+            GoodNotFoundException, QuantityNotEnoughException, PriceNotMatchException {
         int totalSum = 0;
-        for (GoodDTO goodDTO : goodsDTO
-            //исключения, все или ничего
-        ) {
-            if (sellGood(goodDTO) == null) {
-                return null;
-            }
+        for (GoodDTO goodDTO : goodsDTO) {
+            sellGood(goodDTO);
             totalSum += goodDTO.getPrice() * goodDTO.getQuantity();
         }
         return new GoodOperationDTO(goodsDTO, totalSum);
@@ -241,45 +233,14 @@ public class GoodService {
 
 
     public Optional<Integer> getGoodsAvailableQuantityByDate(String item, Date date) {
-        return goodOperationRepository.getGoodOperationsByItemAndDate(item, date);
+        if (goodRepository.findByName(item) == null) {
+            throw new GoodNotFoundException();
+        } else return goodOperationRepository.getGoodOperationsByItemAndDate(item, date);
     }
 
-    public  int getSalesIncomeForPeriod(Date dateFrom, Date dateTo) {
-        List<GoodOperation> goodOperations = goodOperationRepository
-                .getSalesIncomeForPeriod(dateFrom, dateTo);
-        int salesIncome = 0;
-        for (GoodOperation goodOperation : goodOperations
-        ) {
-            salesIncome += goodOperation.getSalesIncome();
-        }
-        return salesIncome;
-    }
-
-    public  int getSalesIncomeGoodForPeriod(String item, Date dateFrom, Date dateTo) {
-        List<GoodOperation> goodOperations = goodOperationRepository
-                .getSalesIncomeGoodForPeriod(item, dateFrom, dateTo);
-        int salesIncome = 0;
-        for (GoodOperation goodOperation : goodOperations
-        ) {
-            salesIncome += goodOperation.getSalesIncome();
-        }
-        return salesIncome;
-       }
-
-    public  int getSalesIncomeCounterpartGoodForPeriod(String counterpartName,
-                                                       String item, Date dateFrom, Date dateTo) {
-        List<GoodOperation> goodOperations = goodOperationRepository
-                .getSalesIncomeCounterpartNameGoodForPeriod(counterpartName,item, dateFrom, dateTo);
-        int salesIncome = 0;
-        for (GoodOperation goodOperation : goodOperations
-        ) {
-            salesIncome += goodOperation.getSalesIncome();
-        }
-        return salesIncome;
-    }
-
-    public  int getSalesIncomeFilter(GoodOperationSpecificationDTO goodOperationSpecificationDTO) {
-        List<GoodOperation> goodOperations = goodOperationSpecificationService.getOperationsToGetIncome(goodOperationSpecificationDTO);
+    public int getSalesIncomeFilter(GoodOperationSpecificationDTO goodOperationSpecificationDTO) {
+        List<GoodOperation> goodOperations = goodOperationSpecificationService
+                .getOperationsToGetIncome(goodOperationSpecificationDTO);
         int salesIncome = 0;
         for (GoodOperation goodOperation : goodOperations
         ) {
@@ -293,6 +254,9 @@ public class GoodService {
     }
 
     public List<Good> getGoodsByCounterPartName(String counterpartName) {
+        if (counterpartRepository.findByName(counterpartName) == null) {
+            throw new CounterpartNotFoundException();
+        }
         return goodRepository.getGoodsByCounterPartName(counterpartName);
     }
 }

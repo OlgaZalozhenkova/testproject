@@ -12,6 +12,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/rating")
 public class RatingController {
+
     private final RatingService ratingService;
 
     // Рейтинги
