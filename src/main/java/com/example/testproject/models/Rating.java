@@ -22,10 +22,10 @@ public class Rating {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     @Column(name = "value")
-    private double value;
+    private int value;
 
     @Column(name = "good_name")
     private String goodName;
@@ -45,7 +45,7 @@ public class Rating {
     @JoinColumn(name = "supplier_id", referencedColumnName = "id")
     private Counterpart counterpart;
 
-    public Rating(double value, String goodName, Good good, Counterpart counterpart) {
+    public Rating(int value, String goodName, Good good, Counterpart counterpart) {
         this.value = value;
         this.goodName = goodName;
         this.good = good;

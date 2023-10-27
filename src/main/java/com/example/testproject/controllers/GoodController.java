@@ -4,9 +4,12 @@ import com.example.testproject.dto.GoodDTO;
 import com.example.testproject.dto.GoodOperationDTO;
 import com.example.testproject.dto.GoodOperationSpecificationDTO;
 import com.example.testproject.models.Good;
-import com.example.testproject.servicies.GoodService1;
+import com.example.testproject.servicies.GoodService;
 import com.example.testproject.util.DataNotFoundException;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -18,7 +21,7 @@ import java.util.List;
 @RequestMapping("/good")
 public class GoodController {
 
-    private final GoodService1 goodService;
+    private final GoodService goodService;
 
     // поставить товар
     @PostMapping("/supply")
@@ -58,14 +61,14 @@ public class GoodController {
 
     // доступное количество товара на складе на определенную дату
     @GetMapping("/available/quantity")
-    Integer getGoodsAvailableQuantityByDate(@RequestParam("item") String item
+    Double getGoodsAvailableQuantityByDate(@RequestParam("item") String item
             , @RequestParam("date") Date date) {
-        return goodService.getGoodsAvailableQuantityByDate(item, date).orElse(0);
+        return goodService.getGoodsAvailableQuantityByDate(item, date).orElse(0.0);
     }
 
     // аналитика по доходу от продаж
     @GetMapping("/salesincome/filter")
-    int getSalesIncomeFilter(@RequestParam(value = "counterpartName", required = false) String counterpartName,
+    double getSalesIncomeFilter(@RequestParam(value = "counterpartName", required = false) String counterpartName,
                              @RequestParam(value = "item", required = false) String item,
                              @RequestParam(value = "dateFrom", required = false) Date dateFrom,
                              @RequestParam(value = "dateTo", required = false) Date dateTo) {

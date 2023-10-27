@@ -6,8 +6,6 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor
@@ -23,34 +21,40 @@ public class GoodCard {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     @Column(name = "name")
     private String name;
 
+    @Column(name = "category")
+    private String category;
+
+    @Column(name = "unit_of_measurement")
+    private String unitOfMeasurement;
+
     @Column(name = "price_supply")
-    private int priceSupply;
+    private double priceSupply;
 
     @Column(name = "price_selling")
-    private int priceSelling;
+    private double priceSelling;
 
     @Column(name = "available_quantity")
-    private int availableQuantity;
+    private double availableQuantity;
 
     @Column(name = "sell_quantity")
-    private int sellQuantity;
+    private double sellQuantity;
 
     @Column(name ="rating")
     private double rating;
 
     @Column(name = "count_value")
-    private double countValue;
+    private int countValue;
 
     @JsonIgnore
     @OneToOne(mappedBy = "goodCard")
     private Good good;
 
-    public GoodCard(String name, int priceSupply, int priceSelling, int availableQuantity, int sellQuantity, double rating, double countValue) {
+    public GoodCard(String name, double priceSupply, double priceSelling, double availableQuantity, double sellQuantity, double rating, int countValue) {
         this.name = name;
         this.priceSupply = priceSupply;
         this.priceSelling = priceSelling;

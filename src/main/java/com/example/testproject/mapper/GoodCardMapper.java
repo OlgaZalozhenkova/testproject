@@ -10,6 +10,8 @@ public class GoodCardMapper {
     public GoodCard map(GoodCardDTO dto) {
         return GoodCard.builder()
                 .name(dto.getName())
+                .category(dto.getCategory())
+                .unitOfMeasurement(dto.getUnitOfMeasurement())
                 .priceSupply(dto.getValueForSupply())
                 .priceSelling(dto.getValueForSelling())
                 .availableQuantity(0)

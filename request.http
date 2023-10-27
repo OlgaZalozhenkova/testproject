@@ -1,8 +1,12 @@
-GET http://localhost:1183/good/salesincome/filter
+GET http://localhost:1197/good/available/quantity?item=good1&date=2023/10/25
 Accept: application/json
 
 ###
-GET http://localhost:1183/good/salesincome/filter?counterpartName=supplier1&item=good1&dateFrom=2023/10/18&dateTo=2023/10/18
+GET http://localhost:1196/good/salesincome/filter
+Accept: application/json
+
+###
+GET http://localhost:1197/good/salesincome/filter?counterpartName=supplier1&item=good1&dateFrom=2023/10/25&dateTo=2023/10/25
 Accept: application/json
 
 ###
@@ -30,7 +34,7 @@ GET http://localhost:1185/goodoperation/counterpart?counterpartName=supplier8
 Accept: application/json
 
 ###
-GET http://localhost:1189/goodoperation/period?dateFrom=2023/10/20&dateTo=2023/10/21
+GET http://localhost:1198/goodoperation/period?dateFrom=2023/10/25&dateTo=2023/10/25
 Accept: application/json
 
 ###
@@ -50,7 +54,7 @@ GET http://localhost:1175/good/salesincome/period?dateFrom=2023/10/18&dateTo=202
 Accept: application/json
 
 ###
-GET http://localhost:1182/good/available/quantity?item=good99&date=2023/10/18
+GET http://localhost:1195/good/available/quantity?item=good1&date=2023/10/18
 Accept: application/json
 
 ###
@@ -62,7 +66,7 @@ GET http://localhost:1182/good/all
 Accept: application/json
 
 ###
-GET http://localhost:1183/goodcard/good111
+GET http://localhost:1201/goodcard/apple
 Accept: application/json
 
 ###

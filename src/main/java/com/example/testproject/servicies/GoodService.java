@@ -14,15 +14,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
 @Transactional(readOnly = true)
-public class GoodService1 {
+public class GoodService {
     private final GoodRepository goodRepository;
     private final CounterpartRepository counterpartRepository;
     private final GoodOperationRepository goodOperationRepository;
@@ -41,9 +38,9 @@ public class GoodService1 {
         }
 
         // проверка цены поставки
-        int priceSupply = goodCard.getPriceSupply();
+        double priceSupply = goodCard.getPriceSupply();
         if (goodDTO.getPrice() > priceSupply) {
-            throw new PriceNotMatchException();
+            throw new RuntimeException("Price doesn't match good card!");
         }
 
         // проверка наличия товара в БД
@@ -79,6 +76,8 @@ public class GoodService1 {
             // назначаю карточку товара
             // товар абсолютно новый  и карточка существует, но еще не привязана
             good.setGoodCard(goodCard);
+            good.setCategory(goodCard.getCategory());
+            good.setUnitOfMeasurement(goodCard.getUnitOfMeasurement());
 
             goodDB = goodRepository.save(good);
 
@@ -90,8 +89,8 @@ public class GoodService1 {
         } else {
 
             // присваиваю новые значения цены и количества товару в БД
-            int quantityNew = goodDB.getQuantity() + goodDTO.getQuantity();
-            int priceNew = (goodDB.getPrice() * goodDB.getQuantity()
+            double quantityNew = goodDB.getQuantity() + goodDTO.getQuantity();
+            double priceNew = (goodDB.getPrice() * goodDB.getQuantity()
                     + goodDTO.getPrice() * goodDTO.getQuantity())
                     / (goodDB.getQuantity() + goodDTO.getQuantity());
 
@@ -136,28 +135,28 @@ public class GoodService1 {
             throw new GoodNotFoundException();
         } else {
 
-            int quantity = goodDTO.getQuantity();
-            int quantityDB = goodDB.getQuantity();
+            double quantity = goodDTO.getQuantity();
+            double quantityDB = goodDB.getQuantity();
 
             if (quantity > quantityDB) { // не хватает количества товаров
-                throw new QuantityNotEnoughException();
+                throw new RuntimeException("Quantity in stock is not enough!");
             }
             String item = goodDTO.getName();
-            int price = goodDTO.getPrice();
+            double price = goodDTO.getPrice();
             GoodCard goodCard = goodCardRepository.findByName(item);
-            int priceSelling = goodCard.getPriceSelling();
+            double priceSelling = goodCard.getPriceSelling();
             if (price < priceSelling) {
-                throw new PriceNotMatchException();
+                throw new RuntimeException("Price doesn't match good card!");
             }
 
-            int sellQuantity = goodCard.getSellQuantity();
+            double sellQuantity = goodCard.getSellQuantity();
 
-            int priceNew = 0;
-            int priceDB = goodDB.getPrice();
+            double priceNew = 0;
+            double priceDB = goodDB.getPrice();
 
-            int salesIncome = ((goodDTO.getPrice() - goodDB.getPrice()) * goodDTO.getQuantity());
+            double salesIncome = ((goodDTO.getPrice() - goodDB.getPrice()) * goodDTO.getQuantity());
 
-            int quantityNew = quantityDB - quantity;
+            double quantityNew = quantityDB - quantity;
             if (quantityNew != 0) {
                 priceNew = (priceDB * quantityDB - priceDB * quantity) / quantityNew;
             } // если количество 0, то цена 0 остается
@@ -210,8 +209,7 @@ public class GoodService1 {
     }
 
     @Transactional
-    public GoodOperationDTO supplyGoods(List<GoodDTO> goodsDTO) throws
-            GoodCardNotFoundException, PriceNotMatchException {
+    public GoodOperationDTO supplyGoods(List<GoodDTO> goodsDTO) {
         int totalSum = 0;
         for (GoodDTO goodDTO : goodsDTO) {
             supplyGood(goodDTO);
@@ -221,8 +219,7 @@ public class GoodService1 {
     }
 
     @Transactional
-    public GoodOperationDTO sellGoods(List<GoodDTO> goodsDTO) throws
-            GoodNotFoundException, QuantityNotEnoughException, PriceNotMatchException {
+    public GoodOperationDTO sellGoods(List<GoodDTO> goodsDTO) {
         int totalSum = 0;
         for (GoodDTO goodDTO : goodsDTO) {
             sellGood(goodDTO);
@@ -232,13 +229,13 @@ public class GoodService1 {
     }
 
 
-    public Optional<Integer> getGoodsAvailableQuantityByDate(String item, Date date) {
+    public Optional<Double> getGoodsAvailableQuantityByDate(String item, Date date) {
         if (goodRepository.findByName(item) == null) {
             throw new GoodNotFoundException();
         } else return goodOperationRepository.getGoodOperationsByItemAndDate(item, date);
     }
 
-    public int getSalesIncomeFilter(GoodOperationSpecificationDTO goodOperationSpecificationDTO) {
+    public double getSalesIncomeFilter(GoodOperationSpecificationDTO goodOperationSpecificationDTO) {
         List<GoodOperation> goodOperations = goodOperationSpecificationService
                 .getOperationsToGetIncome(goodOperationSpecificationDTO);
         int salesIncome = 0;
@@ -259,5 +256,54 @@ public class GoodService1 {
         }
         return goodRepository.getGoodsByCounterPartName(counterpartName);
     }
+
+    @Transactional
+    public Map<String, Double> inventory(Map<String, Double> goodsInFact) {
+        List<Good> goods = goodRepository.findAll();
+        Map<String, Double> goodsInAccounting = new HashMap();
+
+        for (Good good : goods
+        ) {
+            if (good.getQuantity() != 0) {
+                goodsInAccounting.put(good.getName(), good.getQuantity());
+            }
+        }
+
+        if (!goodsInFact.equals(goodsInAccounting)) {
+            Map<String, Double> corrections = new HashMap<>();
+            Double quantityInAccounting;
+            Double quantityInFact;
+            for (Map.Entry entry : goodsInFact.entrySet()) {
+                // проверка на null;
+                quantityInAccounting = goodsInAccounting.get(entry.getKey());
+                if (quantityInAccounting != null) {
+                    quantityInFact = (Double) entry.getValue();
+                    if (quantityInFact > quantityInAccounting |
+                            quantityInFact < quantityInAccounting) {
+                        corrections.put((String) entry.getKey(), quantityInFact);
+                    }
+                    goodsInAccounting.remove(entry.getKey());
+
+                } else {
+                    corrections.put((String) entry.getKey(), (Double) entry.getValue());
+                }
+            }
+            if (!goodsInAccounting.isEmpty()) {
+                for (Map.Entry entry : goodsInAccounting.entrySet()
+                ) {
+                    corrections.put((String) entry.getKey(), 0.0);
+                }
+            }
+
+            for (Map.Entry entry : corrections.entrySet()
+            ) {
+                goodRepository.findByName((String) entry.getKey())
+                        .setQuantity((Double)entry.getValue());
+            }
+            return corrections;
+        }
+        return new HashMap<>();
+    }
 }
+
 

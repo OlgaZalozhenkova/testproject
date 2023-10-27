@@ -13,5 +13,5 @@ import java.util.List;
 @NoArgsConstructor
 public class GoodOperationDTO {
     private List<GoodDTO> items;
-    private int totalSum;
+    private double totalSum;
 }

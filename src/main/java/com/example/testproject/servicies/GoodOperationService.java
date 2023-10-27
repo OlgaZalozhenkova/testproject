@@ -64,13 +64,6 @@ public class GoodOperationService {
 
     public Optional<List<GoodOperation>> getGoodOperationsByOperationTypeAndCounterpartName
             (OperationType operationType, String counterpartName) {
-//        if (!operationType.toString().equals("SELLING") |
-//                !operationType.toString().equals("SUPPLY")) {
-//            throw new OperationTypeNotFoundException();
-
-//        if (operationType != SELLING) {
-//            throw new OperationTypeNotFoundException();
-//        } else
         if (counterpartRepository.findByName(counterpartName) == null) {
             throw new CounterpartNotFoundException();
         } else {

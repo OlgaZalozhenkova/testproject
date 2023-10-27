@@ -9,8 +9,6 @@ import com.example.testproject.repositories.GoodRepository;
 import com.example.testproject.repositories.RatingRepository;
 import com.example.testproject.util.CounterpartNotFoundException;
 import com.example.testproject.util.GoodNotFoundException;
-import com.example.testproject.util.RatingAlreadyExistException;
-import com.example.testproject.util.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,7 +52,7 @@ public class RatingService {
                     .getGoodForSetRating(OperationType.SELLING, counterpartName, goodName);
 
             if (goodForSetRating == null) {
-                throw new NotFoundException("This supplier has not " +
+                throw new RuntimeException("This supplier has not " +
                         "bought this good!");
             }
 
@@ -65,14 +63,14 @@ public class RatingService {
             ratingRepository.save(rating);
             GoodCard goodCard = goodCardRepository.findByName(goodName);
 
-            double countValue = goodCard.getCountValue() + 1;
+            int countValue = goodCard.getCountValue() + 1;
 
             goodCard.setRating((goodCard.getRating() + ratingDTO.getValue()) / countValue);
             goodCard.setCountValue(countValue);
 
             return ratingDTO.toString();
         } else {
-            throw new RatingAlreadyExistException();
+            throw new RuntimeException("Rating already exists!");
         }
     }
 
@@ -95,13 +93,13 @@ public class RatingService {
         Rating ratingDB = ratingRepository.findByCounterpartAndGood(counterpart, good);
 
         if (ratingDB == null) {
-            throw new NotFoundException("Rating you want to change doesn't exist!");
+            throw new RuntimeException("Rating you want to change doesn't exist!");
         }
         if (ratingDB.isDeleted()) {
-            throw new NotFoundException("Rating is already deleted!");
+            throw new RuntimeException("Rating is already deleted!");
         }
         if (ratingDB.isChanged()) {
-            throw new NotFoundException("Rating is already changed!");
+            throw new RuntimeException("Rating is already changed!");
         }
 
         GoodCard goodCard = goodCardRepository.findByName(goodName);
@@ -134,16 +132,16 @@ public class RatingService {
         Rating ratingDB = ratingRepository.findByCounterpartAndGood(counterpart, good);
 
         if (ratingDB == null) {
-            throw new NotFoundException("Rating you want to change doesn't exist!");
+            throw new RuntimeException("Rating you want to change doesn't exist!");
         }
         if (ratingDB.isDeleted()) {
-            throw new NotFoundException("Rating is already deleted!");
+            throw new RuntimeException("Rating is already deleted!");
         }
 
         ratingDB.setDeleted(true);
         GoodCard goodCard = goodCardRepository.findByName(goodName);
         double currentRating = goodCard.getRating();
-        double countValue = goodCard.getCountValue();
+        int countValue = goodCard.getCountValue();
 
         // в карточке существует единственная оценка этого покупателя
         if (countValue == 1) {

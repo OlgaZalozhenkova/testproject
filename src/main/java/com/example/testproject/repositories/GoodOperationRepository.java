@@ -28,9 +28,10 @@ public interface GoodOperationRepository extends JpaRepository<GoodOperation, In
 
     List<GoodOperation> findByCounterpartName(String counterpartName);
 
-    @Query(value = "select good_operations.quantity_db from good_operations\n" +
-            "where good_operations.item = :item and good_operations.date<= :date order by date desc limit 1", nativeQuery = true)
-    Optional<Integer> getGoodOperationsByItemAndDate(String item, Date date);
+    @Query(value = "select good_operations.quantity_db from good_operations " +
+            "where good_operations.item = :item and good_operations.date <= :date " +
+            "order by date desc limit 1", nativeQuery = true)
+    Optional<Double> getGoodOperationsByItemAndDate(String item, Date date);
 
     @Query("select g from GoodOperation g where g.operationType = 'SELLING'"
             + "and g.date >= :dateFrom and g.date <= :dateTo")

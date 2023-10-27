@@ -10,7 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RatingDTO {
-    private double value;
+    private int value;
     private String goodName;
     private String counterpartName;
 

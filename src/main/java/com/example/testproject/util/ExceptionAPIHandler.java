@@ -23,25 +23,9 @@ public class ExceptionAPIHandler {
     }
 
     @ExceptionHandler
-    private ResponseEntity<ErrorResponse> handleException(PriceNotMatchException e) {
-        ErrorResponse response = new ErrorResponse
-                ("Price doesn't match goodcard!",
-                        System.currentTimeMillis());
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler
     private ResponseEntity<ErrorResponse> handleException(GoodNotFoundException e) {
         ErrorResponse response = new ErrorResponse
                 ("Good was not found!",
-                        System.currentTimeMillis());
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler
-    private ResponseEntity<ErrorResponse> handleException(QuantityNotEnoughException e) {
-        ErrorResponse response = new ErrorResponse
-                ("Available quantity in stock is not enough!",
                         System.currentTimeMillis());
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
@@ -55,28 +39,10 @@ public class ExceptionAPIHandler {
     }
 
     @ExceptionHandler
-    private ResponseEntity<ErrorResponse> handleException(OperationTypeNotFoundException e) {
-        ErrorResponse response = new ErrorResponse
-                ("Operation type is not found!",
-                        System.currentTimeMillis());
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler
-    private ResponseEntity<ErrorResponse> handleException(RatingAlreadyExistException e) {
-        ErrorResponse response = new ErrorResponse
-                ("Rating id already exists!",
-                        System.currentTimeMillis());
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler
-    private ResponseEntity<ErrorResponse> handleException(NotFoundException e) {
+    private ResponseEntity<ErrorResponse> handleException(RuntimeException e) {
         ErrorResponse response = new ErrorResponse
                 (e.getMessage(),
                         System.currentTimeMillis());
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
-
-
 }

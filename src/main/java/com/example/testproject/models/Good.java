@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
+@ToString
 @Table(name = "good")
 @Builder
 @JsonIdentityInfo(
@@ -23,19 +24,25 @@ public class Good {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     @Column(name = "name")
     private String name;
 
     @Column(name = "price")
-    private int price;
+    private double price;
 
     @Column(name = "quantity")
-    private int quantity;
+    private double quantity;
+
+    @Column(name = "unit_of_measurement")
+    private String unitOfMeasurement;
+
+    @Column(name = "category")
+    private String category;
 
     @Column(name ="sales_income")
-    int salesIncome;
+    double salesIncome;
 
     @JsonIgnore
     @ManyToMany
