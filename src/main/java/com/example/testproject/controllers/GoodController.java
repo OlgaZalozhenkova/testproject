@@ -6,14 +6,14 @@ import com.example.testproject.dto.GoodOperationSpecificationDTO;
 import com.example.testproject.models.Good;
 import com.example.testproject.servicies.GoodService;
 import com.example.testproject.util.DataNotFoundException;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -22,6 +22,7 @@ import java.util.List;
 public class GoodController {
 
     private final GoodService goodService;
+    private final SimpleDateFormat simpleDateFormat;
 
     // поставить товар
     @PostMapping("/supply")
@@ -47,9 +48,14 @@ public class GoodController {
         }
     }
 
+    @GetMapping("/item")
+    public Good findByItem(@RequestParam("name") String name) {
+        return goodService.findByName(name);
+    }
+
     // товары определенного контрагента
     @GetMapping("/counterpart")
-    List<Good> getGoodsByCounterpartName(@RequestParam("counterpartName")
+    public List<Good> getGoodsByCounterpartName(@RequestParam("counterpartName")
                                                  String counterpartName) {
         List<Good> goods = goodService.getGoodsByCounterPartName(counterpartName);
         if (goods.isEmpty()) {
@@ -59,23 +65,52 @@ public class GoodController {
         }
     }
 
+    // товары определенной категории
+    @GetMapping("/category")
+    public List<Good> findByCategory(@RequestParam("category") String category) {
+        List<Good> goods =goodService.findByCategory(category);
+        if (goods.isEmpty()) {
+            throw new DataNotFoundException();
+        } else {
+            return goods;
+        }
+    }
+
     // доступное количество товара на складе на определенную дату
     @GetMapping("/available/quantity")
-    Double getGoodsAvailableQuantityByDate(@RequestParam("item") String item
+    public Double getGoodsAvailableQuantityByDate(@RequestParam("item") String item
             , @RequestParam("date") Date date) {
         return goodService.getGoodsAvailableQuantityByDate(item, date).orElse(0.0);
     }
 
     // аналитика по доходу от продаж
-    @GetMapping("/salesincome/filter")
-    double getSalesIncomeFilter(@RequestParam(value = "counterpartName", required = false) String counterpartName,
-                             @RequestParam(value = "item", required = false) String item,
-                             @RequestParam(value = "dateFrom", required = false) Date dateFrom,
-                             @RequestParam(value = "dateTo", required = false) Date dateTo) {
+//    @GetMapping("/salesincome/filter")
+//    public double getSalesIncomeFilter(@RequestParam(value = "counterpartName", required = false) String counterpartName,
+//                             @RequestParam(value = "item", required = false) String item,
+//                             @RequestParam(value = "fromDate", required = false) String fromDate,
+//                             @RequestParam(value = "toDate", required = false) String toDate) throws ParseException {
+//
+//        simpleDateFormat.applyPattern("yyyy/MM/dd");
+//        Date dateFrom = simpleDateFormat.parse(fromDate);
+//        Date dateTo = simpleDateFormat.parse(toDate);
+//        GoodOperationSpecificationDTO goodOperationSpecificationDTO =
+//                new GoodOperationSpecificationDTO(item, counterpartName,dateFrom, dateTo);
+//        return goodService.getSalesIncomeFilter(goodOperationSpecificationDTO);
+//    }
 
-        GoodOperationSpecificationDTO goodOperationSpecificationDTO =
-                new GoodOperationSpecificationDTO(item, counterpartName, dateFrom, dateTo);
+    @GetMapping("/salesincome/filter")
+    public double getSalesIncomeFilter(@RequestParam(value = "counterpartName", required = false) String counterpartName,
+                                       @RequestParam(value = "item", required = false) String item,
+                                       @RequestParam(value = "dateFrom", required = false) Date dateFrom,
+                                       @RequestParam(value = "dateTo", required = false) Date dateTo)  {
+
+          GoodOperationSpecificationDTO goodOperationSpecificationDTO =
+                new GoodOperationSpecificationDTO(item, counterpartName,dateFrom, dateTo);
         return goodService.getSalesIncomeFilter(goodOperationSpecificationDTO);
     }
 
+    @PostMapping("/inventory")
+    public Map<String,Double> makeInventory(@RequestBody Map<String, Double> goodsInFact) {
+        return goodService.makeInventory(goodsInFact);
+    }
 }

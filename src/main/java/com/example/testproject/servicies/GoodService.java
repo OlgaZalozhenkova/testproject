@@ -258,7 +258,7 @@ public class GoodService {
     }
 
     @Transactional
-    public Map<String, Double> inventory(Map<String, Double> goodsInFact) {
+    public Map<String, Double> makeInventory(Map<String, Double> goodsInFact) {
         List<Good> goods = goodRepository.findAll();
         Map<String, Double> goodsInAccounting = new HashMap();
 
@@ -274,8 +274,10 @@ public class GoodService {
             Double quantityInAccounting;
             Double quantityInFact;
             for (Map.Entry entry : goodsInFact.entrySet()) {
-                // проверка на null;
                 quantityInAccounting = goodsInAccounting.get(entry.getKey());
+                // не проверка на 0 (это учтено выше), а проверка существования объекта
+                // выявление объектов, которые есть в инв., а в Map нет(в БД они могут быть с
+                // количеством 0
                 if (quantityInAccounting != null) {
                     quantityInFact = (Double) entry.getValue();
                     if (quantityInFact > quantityInAccounting |
@@ -283,7 +285,8 @@ public class GoodService {
                         corrections.put((String) entry.getKey(), quantityInFact);
                     }
                     goodsInAccounting.remove(entry.getKey());
-
+                    // в Map нет, а БД есть с количеством 0
+                    // те позиции, кот.передали в инв. уже когда-то приходовались и есть карточка товара
                 } else {
                     corrections.put((String) entry.getKey(), (Double) entry.getValue());
                 }
@@ -295,14 +298,65 @@ public class GoodService {
                 }
             }
 
+            createGoodOperationInventory(corrections);
+
+            // назначаем новое количество товару
             for (Map.Entry entry : corrections.entrySet()
             ) {
                 goodRepository.findByName((String) entry.getKey())
-                        .setQuantity((Double)entry.getValue());
+                        .setQuantity((Double) entry.getValue());
             }
             return corrections;
         }
         return new HashMap<>();
+    }
+
+    @Transactional
+    public void createGoodOperationInventory(Map<String, Double> corrections) {
+        for (Map.Entry entry : corrections.entrySet()
+        ) {
+            // из логики приложения good всегда будет найден
+            Good good = goodRepository.findByName((String) entry.getKey());
+            Double quantityInAccounting = good.getQuantity();
+            Double quantityInFact = (Double) entry.getValue();
+            Double quantityToCorrect;
+            Counterpart counterpartInventory;
+            counterpartInventory = counterpartRepository.findByName("Inventory");
+            if (counterpartInventory == null) {
+                counterpartInventory = new Counterpart("Inventory");
+                counterpartRepository.save(counterpartInventory);
+            }
+
+            // в списке переданы позиции, кот. отличаются по кол-ву от БД и их новые количества
+                quantityToCorrect = quantityInFact - quantityInAccounting;
+
+            GoodOperation goodOperation = GoodOperation.builder()
+                    .item((String) entry.getKey())
+                    .operationType(OperationType.INVENTORY)
+                    .price(0.0)
+                    .quantity(quantityToCorrect)
+                    .counterpartName("Inventory")
+                    .date(new Date())
+                    .priceDB(good.getPrice())
+                    .quantityDB(quantityInFact)
+                    .good(good)
+                    .counterpart(counterpartInventory) // контрагент либо уже существовал в БД либо его сохранили как нового
+                    .build();
+            goodOperationRepository.save(goodOperation);
+        }
+    }
+
+    public List<Good> findByCategory(String category) {
+       return goodRepository.findByCategory(category);
+    }
+
+    public Good findByName(String name) {
+        Good good = goodRepository.findByName(name);
+        if (good == null) {
+            throw new GoodNotFoundException();
+        } else {
+            return good;
+        }
     }
 }
 

@@ -20,4 +20,6 @@ public interface GoodRepository extends JpaRepository<Good,Integer> {
     @Query("select g from Good g join g.counterparts counterpart where counterpart.name = :name")
     List<Good> getGoodsByCounterPartName(String name);
 
+    List<Good> findByCategory(String category);
+
 }

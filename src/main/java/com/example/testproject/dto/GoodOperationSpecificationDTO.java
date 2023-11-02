@@ -3,7 +3,6 @@ package com.example.testproject.dto;
 import com.example.testproject.models.OperationType;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 

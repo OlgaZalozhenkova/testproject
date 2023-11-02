@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -30,9 +31,17 @@ public class GoodOperationController {
     }
 
     // журнал операций за указанный период
+//    @GetMapping("/period")
+//    public List<GoodOperation> getGoodOperationsForPeriod
+//    (@RequestParam("fromDate") String fromDate, @RequestParam("toDate") String toDate)
+//            throws ParseException {
+//        return goodOperationService.getGoodOperationsForPeriod(fromDate, toDate);
+//    }
+
     @GetMapping("/period")
     public List<GoodOperation> getGoodOperationsForPeriod
-    (@RequestParam("dateFrom") Date dateFrom, @RequestParam("dateTo") Date dateTo) {
+            (@RequestParam("dateFrom") Date dateFrom, @RequestParam("dateTo") Date dateTo)
+            throws ParseException {
         return goodOperationService.getGoodOperationsForPeriod(dateFrom, dateTo);
     }
 

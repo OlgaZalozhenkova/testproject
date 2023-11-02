@@ -9,6 +9,8 @@ import com.example.testproject.util.DataNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +21,7 @@ public class GoodOperationService {
 
     private final GoodOperationRepository goodOperationRepository;
     private final CounterpartRepository counterpartRepository;
+    private final SimpleDateFormat simpleDateFormat;
 
     public List<GoodOperation> findAll() {
         List<GoodOperation> goodOperations = goodOperationRepository.findAll();
@@ -29,9 +32,29 @@ public class GoodOperationService {
         }
     }
 
-    public List<GoodOperation> getGoodOperationsForPeriod(Date dateFrom, Date dateTo) {
+//    public List<GoodOperation> getGoodOperationsForPeriod
+//            (String fromDate, String toDate) throws ParseException {
+//        simpleDateFormat.applyPattern("yyyy/MM/dd");
+//        Date dateFrom = simpleDateFormat.parse(fromDate);
+//        Date dateTo = simpleDateFormat.parse(toDate);
+//        List<GoodOperation> goodOperations = goodOperationRepository
+//                .getGoodOperationsForPeriod(dateFrom, dateTo);
+//
+//        if (goodOperations.isEmpty()) {
+//            throw new DataNotFoundException();
+//        } else {
+//            return goodOperations;
+//        }
+//    }
+
+    public List<GoodOperation> getGoodOperationsForPeriod
+            (Date dateFrom, Date dateTo) throws ParseException {
+//        simpleDateFormat.applyPattern("yyyy/MM/dd");
+//        Date dateFrom = simpleDateFormat.parse(fromDate);
+//        Date dateTo = simpleDateFormat.parse(toDate);
         List<GoodOperation> goodOperations = goodOperationRepository
                 .getGoodOperationsForPeriod(dateFrom, dateTo);
+
         if (goodOperations.isEmpty()) {
             throw new DataNotFoundException();
         } else {

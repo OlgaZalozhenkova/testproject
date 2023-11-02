@@ -1,12 +1,16 @@
+GET http://localhost:1209/good/category?category=fruit
+Accept: application/json
+
+###
 GET http://localhost:1197/good/available/quantity?item=good1&date=2023/10/25
 Accept: application/json
 
 ###
-GET http://localhost:1196/good/salesincome/filter
+GET http://localhost:1218/good/salesincome/filter?counterpartName=supplier1&item=apple&dateFrom=2023/10/25
 Accept: application/json
 
 ###
-GET http://localhost:1197/good/salesincome/filter?counterpartName=supplier1&item=good1&dateFrom=2023/10/25&dateTo=2023/10/25
+GET http://localhost:1197/good/salesincome/filter?counterpartName=supplier1&item=apple&fromDate=2023/10/25&toDate=2023/10/25
 Accept: application/json
 
 ###
@@ -34,7 +38,7 @@ GET http://localhost:1185/goodoperation/counterpart?counterpartName=supplier8
 Accept: application/json
 
 ###
-GET http://localhost:1198/goodoperation/period?dateFrom=2023/10/25&dateTo=2023/10/25
+GET http://localhost:1212/goodoperation/period?fromDate=2023/10/25&toDate=2023/10/30
 Accept: application/json
 
 ###
