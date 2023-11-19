@@ -17,4 +17,5 @@ public interface RatingRepository extends JpaRepository<Rating, Integer> {
     @Query("select r from Rating r join r.counterpart counterpart where r.goodName =:goodName and counterpart.name =:counterpartName")
     Optional<Rating> findByGoodAndCounterpart(String goodName, String counterpartName);
 
+    Rating findByGoodName(String googName);
 }

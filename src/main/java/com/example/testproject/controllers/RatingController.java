@@ -41,4 +41,9 @@ public class RatingController {
                                                      @RequestParam("counterpartName") String counterpartName) {
         return ratingService.findByGoodAndCounterpart(goodName, counterpartName);
     }
+
+    @GetMapping("/get/name")
+    public Rating findByGoodName(@RequestParam("goodName") String goodName) {
+        return ratingService.findByGoodName(goodName);
+    }
 }

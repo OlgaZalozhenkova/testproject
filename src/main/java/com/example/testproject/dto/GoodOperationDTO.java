@@ -14,4 +14,12 @@ import java.util.List;
 public class GoodOperationDTO {
     private List<GoodDTO> items;
     private double totalSum;
+
+    @Override
+    public String toString() {
+        return "GoodOperationDTO{" +
+                "items=" + items +
+                ", totalSum=" + totalSum +
+                '}';
+    }
 }

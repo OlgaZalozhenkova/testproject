@@ -158,4 +158,12 @@ public class RatingService {
     public Optional<Rating> findByGoodAndCounterpart(String goodName, String counterpartName) {
         return ratingRepository.findByGoodAndCounterpart(goodName, counterpartName);
     }
+
+    public Rating findByGoodName(String goodName) {
+        Rating rating = ratingRepository.findByGoodName(goodName);
+        if (rating == null) {
+            throw new RuntimeException("Rating with the good name doesn't exist!");
+        }
+        return  rating;
+    }
 }

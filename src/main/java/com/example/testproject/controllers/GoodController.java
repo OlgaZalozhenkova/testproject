@@ -1,8 +1,6 @@
 package com.example.testproject.controllers;
 
-import com.example.testproject.dto.GoodDTO;
-import com.example.testproject.dto.GoodOperationDTO;
-import com.example.testproject.dto.GoodOperationSpecificationDTO;
+import com.example.testproject.dto.*;
 import com.example.testproject.models.Good;
 import com.example.testproject.servicies.GoodService;
 import com.example.testproject.util.DataNotFoundException;
@@ -25,15 +23,17 @@ public class GoodController {
     private final SimpleDateFormat simpleDateFormat;
 
     // поставить товар
+
+
     @PostMapping("/supply")
-    public GoodOperationDTO supplyGoods(@RequestBody List<GoodDTO> goodsDTO) {
-        return goodService.supplyGoods(goodsDTO);
+    public GoodOperationDTO supplyGoods(@RequestBody GoodsObject goodsObject) {
+        return goodService.supplyGoods(goodsObject);
     }
 
     // продать товар
     @PostMapping("/sell")
-    public GoodOperationDTO sellGoods(@RequestBody List<GoodDTO> goodsDTO) {
-        return goodService.sellGoods(goodsDTO);
+    public GoodOperationDTO sellGoods(@RequestBody GoodsObject goodsObject) {
+        return goodService.sellGoods(goodsObject);
     }
 
     // аналитика по товарам
@@ -110,7 +110,7 @@ public class GoodController {
     }
 
     @PostMapping("/inventory")
-    public Map<String,Double> makeInventory(@RequestBody Map<String, Double> goodsInFact) {
-        return goodService.makeInventory(goodsInFact);
+    public String makeInventory(@RequestBody InventoryObject inventoryObject) {
+        return goodService.makeInventory(inventoryObject);
     }
 }

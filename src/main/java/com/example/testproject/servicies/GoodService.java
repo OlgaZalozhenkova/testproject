@@ -1,8 +1,6 @@
 package com.example.testproject.servicies;
 
-import com.example.testproject.dto.GoodDTO;
-import com.example.testproject.dto.GoodOperationDTO;
-import com.example.testproject.dto.GoodOperationSpecificationDTO;
+import com.example.testproject.dto.*;
 import com.example.testproject.mapper.GoodMapper;
 import com.example.testproject.models.*;
 import com.example.testproject.repositories.CounterpartRepository;
@@ -209,23 +207,25 @@ public class GoodService {
     }
 
     @Transactional
-    public GoodOperationDTO supplyGoods(List<GoodDTO> goodsDTO) {
+    public GoodOperationDTO supplyGoods(GoodsObject goodsObject) {
+        List<GoodDTO> goodDTOs = goodsObject.getGoodDTOs();
         int totalSum = 0;
-        for (GoodDTO goodDTO : goodsDTO) {
+        for (GoodDTO goodDTO : goodDTOs) {
             supplyGood(goodDTO);
             totalSum += goodDTO.getPrice() * goodDTO.getQuantity();
         }
-        return new GoodOperationDTO(goodsDTO, totalSum);
+        return new GoodOperationDTO(goodDTOs, totalSum);
     }
 
     @Transactional
-    public GoodOperationDTO sellGoods(List<GoodDTO> goodsDTO) {
+    public GoodOperationDTO sellGoods(GoodsObject goodsObject) {
+        List<GoodDTO> goodDTOs = goodsObject.getGoodDTOs();
         int totalSum = 0;
-        for (GoodDTO goodDTO : goodsDTO) {
+        for (GoodDTO goodDTO : goodDTOs) {
             sellGood(goodDTO);
             totalSum += goodDTO.getPrice() * goodDTO.getQuantity();
         }
-        return new GoodOperationDTO(goodsDTO, totalSum);
+        return new GoodOperationDTO(goodDTOs, totalSum);
     }
 
 
@@ -258,7 +258,8 @@ public class GoodService {
     }
 
     @Transactional
-    public Map<String, Double> makeInventory(Map<String, Double> goodsInFact) {
+    public String makeInventory(InventoryObject inventoryObject) {
+        Map<String, Double> goodsInFact = inventoryObject.getGoodsInFact();
         List<Good> goods = goodRepository.findAll();
         Map<String, Double> goodsInAccounting = new HashMap();
 
@@ -306,9 +307,9 @@ public class GoodService {
                 goodRepository.findByName((String) entry.getKey())
                         .setQuantity((Double) entry.getValue());
             }
-            return corrections;
+            return corrections.toString();
         }
-        return new HashMap<>();
+        return new HashMap<>().toString();
     }
 
     @Transactional
