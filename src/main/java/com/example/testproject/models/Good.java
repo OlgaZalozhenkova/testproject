@@ -26,7 +26,7 @@ public class Good {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "name")
+    @Column(name = "gname")
     private String name;
 
     @Column(name = "price")

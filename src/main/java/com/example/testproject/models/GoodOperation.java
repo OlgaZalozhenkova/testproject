@@ -40,7 +40,7 @@ public class GoodOperation {
     @Column(name = "supplier_name")
     private String counterpartName;
 
-    @Column(name = "date")
+    @Column(name = "odate")
     private Date date;
 
     @Column(name = "price_db")

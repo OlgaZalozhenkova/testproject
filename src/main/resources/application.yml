@@ -1,12 +1,12 @@
 server:
-  port: 1239
+  port: 8080
 
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/testproject
     username: postgres
-    password: postgre
+    password: 1234
 
   jpa:
     properties:

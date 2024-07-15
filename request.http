@@ -1,40 +1,38 @@
-GET http://localhost:1209/good/category?category=fruit
+GET http://localhost:8080/counterpart/goodname?name=apple
 Accept: application/json
 
 ###
-GET http://localhost:1197/good/available/quantity?item=good1&date=2023/10/25
+GET http://localhost:8080/goodcard/apple
 Accept: application/json
 
 ###
-GET http://localhost:1218/good/salesincome/filter?counterpartName=supplier1&item=apple&dateFrom=2023/10/25
+GET http://localhost:8080/good/all
+
+###
+GET http://localhost:8080/good/item?name=apple
 Accept: application/json
 
 ###
-GET http://localhost:1197/good/salesincome/filter?counterpartName=supplier1&item=apple&fromDate=2023/10/25&toDate=2023/10/25
+GET http://localhost:8080/good/category?category=fruit
 Accept: application/json
 
 ###
-GET http://localhost:1191/rating/set?goodName=good22&counterpartName=supplier1
+GET http://localhost:8080/good/available/quantity?item=apple&date=2024/07/02
 Accept: application/json
 
 ###
-GET http://localhost:1177/goodoperation/filter?item=good1&counterpartName=supplier1
+GET http://localhost:8080/good/salesincome/filter?conterpartName=Smirnov
 Accept: application/json
 
 ###
-GET http://localhost:1176/goodoperation/filter?item=good1&operationType=SELLING&counterpartName=supplier1
+GET http://localhost:8080/goodoperation/all
+Accept: application/json
+
+###GET http://localhost:8080/rating/get?goodName=apple&counterpartName=Smirnov
 Accept: application/json
 
 ###
-GET http://localhost:1188/goodoperation/type/counterpart/period?operationType=SELLING&counterpartName=supplier8&dateFrom=2023/10/18&dateTo=2023/10/11
-Accept: application/json
-
-###
-GET http://localhost:1190/goodoperation/type/counterpart?operationType=SELLING&counterpartName=supplier88
-Accept: application/json
-
-###
-GET http://localhost:1185/goodoperation/counterpart?counterpartName=supplier8
+GET http://localhost:8080/rating/get/name?goodName=apple
 Accept: application/json
 
 ###
